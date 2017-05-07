@@ -14,7 +14,8 @@ namespace BreadPlayer.Helpers
     {
         public bool IsDeviceTouchEnabled()
         {
-           return PointerDevice.GetPointerDevices()[0]?.PointerDeviceType == PointerDeviceType.Touch;
+            TouchCapabilities touchCapabilities = new Windows.Devices.Input.TouchCapabilities();
+            return touchCapabilities.TouchPresent != 0;
         }
     }
 }

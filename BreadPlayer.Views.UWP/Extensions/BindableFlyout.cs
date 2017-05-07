@@ -73,7 +73,7 @@ namespace BreadPlayer.Extensions
                     Text = menuItem.Text,
                     Command = menuItem.Command
                 };
-                 item.CommandParameter =  menuItem.CommandParameter == null ? item : menuItem.CommandParameter;
+                 item.CommandParameter =  menuItem.CommandParameter == null ? new object[] { item.Tag, item.Text } : menuItem.CommandParameter;
                 item.Tag = menuFlyout.DataContext as Mediafile;
                 if(menuFlyout.Items.Count == 1)
                 {
@@ -146,7 +146,7 @@ namespace BreadPlayer.Extensions
                             Text = menuItem.Text,
                             Command = menuItem.Command
                         };
-                        item.CommandParameter = menuItem.CommandParameter == null ? item : menuItem.CommandParameter;
+                        item.CommandParameter = menuItem.CommandParameter == null ? new object[] { item.Tag, item.Text } : menuItem.CommandParameter;
                         if (menuFlyout.GetType() != typeof(CustomFlyout)) item.Tag = "Current";
                         if (addTo.Items.Count == 1)
                         {

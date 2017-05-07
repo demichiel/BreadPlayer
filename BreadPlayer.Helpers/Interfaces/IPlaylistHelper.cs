@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace BreadPlayer.Helpers.Interfaces
 {
@@ -11,6 +12,6 @@ namespace BreadPlayer.Helpers.Interfaces
     {
         Task<Playlist> ShowAddPlaylistDialogAsync(PlaylistService PlaylistService, string title = "Name this playlist", string playlistName = "", string desc = "", string password = "");
         void ClearPlaylists();
-        void AddPlaylist(Playlist playlist);
+        void AddPlaylist(Playlist playlist, ICommand command);
     }
 }

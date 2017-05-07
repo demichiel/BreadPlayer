@@ -843,73 +843,41 @@ namespace BreadPlayer.ViewModels
         {
             foreach (var list in await PlaylistService.GetPlaylistsAsync())
             {
-                CrossPlatformHelper.PlaylistHelper.AddPlaylist(list);
+                CrossPlatformHelper.PlaylistHelper.AddPlaylist(list, AddToPlaylistCommand);
             }
         }
-        async void AddToPlaylist(object file)
+        async void AddToPlaylist(object arguments)
         {
-            if (file != null)
+            if (arguments != null)
             {
-            //    MenuFlyoutItem menu = file as MenuFlyoutItem;
-            //    //songList is a variable to initiate both (if available) sources of songs. First is AlbumSongs and the second is the direct library songs.
-            //    List<Mediafile> songList = new List<Mediafile>();
-            //    if (menu.Tag == null)
-            //    {
-            //        songList = SelectedItems;
-            //    }
-            //    else
-            //    {
-            //        songList.Add(Player.CurrentlyPlayingFile);
-            //    }
-            //    Playlist dictPlaylist = menu.Text == "New Playlist" ? await CrossPlatformHelper.PlaylistHelper.ShowAddPlaylistDialogAsync() : await PlaylistService.GetPlaylistAsync(menu?.Text);
-            //    bool proceed = false;
-            //    if (menu.Text != "New Playlist")
-            //        proceed = await ViewModels.Init.SharedLogic.AskPasswordForPlaylist(dictPlaylist);
-            //    else
-            //        proceed = true;
-            //    if (dictPlaylist != null && proceed)
-            //        await AddPlaylistAsync(dictPlaylist, true, songList);
-            //}
-            //else
-            //{
-            //    var pList = await CrossPlatformHelper.PlaylistHelper.ShowAddPlaylistDialogAsync();
-            //    if(pList != null)
-            //        await AddPlaylistAsync(pList, false);
+                var args = (object[])arguments;
+                //songList is a variable to initiate both (if available) sources of songs. First is AlbumSongs and the second is the direct library songs.
+                List<Mediafile> songList = new List<Mediafile>();
+                if (args[0] == null)
+                {
+                    songList = SelectedItems;
+                }
+                else
+                {
+                    songList.Add(Player.CurrentlyPlayingFile);
+                }
+                Playlist dictPlaylist = args[1].ToString() == "New Playlist" ? await CrossPlatformHelper.PlaylistHelper.ShowAddPlaylistDialogAsync(PlaylistService) : await PlaylistService.GetPlaylistAsync(args[1].ToString());
+                bool proceed = false;
+                if (args[1].ToString() != "New Playlist")
+                    proceed = await ViewModels.Init.SharedLogic.AskPasswordForPlaylist(dictPlaylist);
+                else
+                    proceed = true;
+                if (dictPlaylist != null && proceed)
+                    await AddPlaylistAsync(dictPlaylist, true, songList);
+            }
+            else
+            {
+                var pList = await CrossPlatformHelper.PlaylistHelper.ShowAddPlaylistDialogAsync(PlaylistService);
+                if (pList != null)
+                    await AddPlaylistAsync(pList, false);
             }
         }
-
-        //async Task<Playlist> ShowAddPlaylistDialogAsync(string title = "Name this playlist", string playlistName = "", string desc = "", string password = "")
-        //{
-        //    var dialog = new InputDialog()
-        //    {
-        //        Title = title,
-        //        Text = playlistName,
-        //        Description = desc,
-        //        IsPrivate = password.Length > 0,
-        //        Password = password
-        //    };
-        //    if (CoreWindow.GetForCurrentThread().Bounds.Width <= 501)
-        //        dialog.DialogWidth = CoreWindow.GetForCurrentThread().Bounds.Width - 50;
-        //    else
-        //        dialog.DialogWidth = CoreWindow.GetForCurrentThread().Bounds.Width - 300;
-        //    if (await dialog.ShowAsync() == ContentDialogResult.Primary && dialog.Text != "")
-        //    {
-        //        var salthash = Core.Common.PasswordStorage.CreateHash(dialog.Password);
-        //        var Playlist = new Playlist();
-        //        Playlist.Name = dialog.Text;
-        //        Playlist.Description = dialog.Description;
-        //        Playlist.IsPrivate = dialog.Password.Length > 0;
-        //        Playlist.Hash = salthash.Hash;
-        //        Playlist.Salt = salthash.Salt;
-        //        if (PlaylistService.PlaylistExists(Playlist.Name))
-        //        {
-        //            Playlist = await ShowAddPlaylistDialogAsync("Playlist already exists! Please choose another name.", Playlist.Name, Playlist.Description);
-        //        }
-        //        return Playlist;
-        //    }
-        //    return null;
-        //}
-
+  
         public async Task AddSongsToPlaylist(Playlist list, List<Mediafile> songsToadd)
         {
             if (songsToadd.Any())
@@ -920,29 +888,13 @@ namespace BreadPlayer.ViewModels
                 });
             }
         }
-      
-        //public void AddPlaylist(Playlist Playlist)
-        //{
-        //    var cmd = new ContextMenuCommand(AddToPlaylistCommand, Playlist.Name);
-        //    ViewModels.Init.SharedLogic.OptionItems.Add(cmd);
-        //    SharedLogic.PlaylistsItems.Add(new SplitViewMenu.SimpleNavMenuItem
-        //    {
-        //        Arguments = Playlist,
-        //        Label = Playlist.Name,
-        //        DestinationPage = typeof(PlaylistView),
-        //        Symbol = Symbol.List,
-        //        FontGlyph = "\u0045",
-        //        ShortcutTheme = ElementTheme.Dark,
-        //        HeaderVisibility = Visibility.Collapsed
-        //    });
-        //}
         public async Task AddPlaylistAsync(Playlist plist, bool addsongs, List<Mediafile> songs = null)
         {
             await CrossPlatformHelper.Dispatcher.RunAsync(async () =>
             {
                 if (!PlaylistService.PlaylistExists(plist.Name))
                 {
-                    CrossPlatformHelper.PlaylistHelper.AddPlaylist(plist);
+                    CrossPlatformHelper.PlaylistHelper.AddPlaylist(plist, AddToPlaylistCommand);
                     await PlaylistService.AddPlaylistAsync(plist);
                 }
                 if (addsongs)

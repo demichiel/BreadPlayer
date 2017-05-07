@@ -10,14 +10,26 @@ using Windows.UI.Core;
 using Windows.UI.Xaml.Controls;
 using BreadPlayer.Database;
 using BreadPlayer.Core;
+using Windows.UI.Xaml;
 
 namespace BreadPlayer.Helpers
 {
     public class PlaylistHelper : IPlaylistHelper
     {
-        public void AddPlaylist(Playlist playlist)
+        public void AddPlaylist(Playlist Playlist, System.Windows.Input.ICommand command)
         {
-            throw new NotImplementedException();
+            var cmd = new ContextMenuCommand(command, Playlist.Name);
+            ViewModels.Init.SharedLogic.OptionItems.Add(cmd);
+            SharedLogic.PlaylistsItems.Add(new SplitViewMenu.SimpleNavMenuItem
+            {
+                Arguments = Playlist,
+                Label = Playlist.Name,
+                DestinationPage = typeof(PlaylistView),
+                Symbol = Symbol.List,
+                FontGlyph = "\u0045",
+                ShortcutTheme = ElementTheme.Dark,
+                HeaderVisibility = Visibility.Collapsed
+            });
         }
 
         public void ClearPlaylists()
