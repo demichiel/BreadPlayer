@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using BreadPlayer.Models;
+using System.Threading.Tasks;
 
 namespace BreadPlayer.Helpers.Interfaces
 {
@@ -6,6 +7,6 @@ namespace BreadPlayer.Helpers.Interfaces
     {
         Task ShowMessageBoxAsync(string message, string title);
         Task ShowMessageAsync(string message, int duration = 10);
-        //void SendUpcomingSongNotification(Mediafile mediaFile);
+        void SendUpcomingSongNotification(Mediafile mediaFile);
     }
 }

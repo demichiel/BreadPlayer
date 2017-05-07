@@ -16,12 +16,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-using System;
+using BreadPlayer.Models.Interfaces;
 using System.Collections.Generic;
 
 namespace BreadPlayer.Models
 {
-    public class Playlist : ObservableObject, Database.IDBRecord
+    public class Playlist : ObservableObject, IDBRecord
     {
         private long id;
         public long Id { get { return id; } set { Set(ref id, value); } }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace BreadPlayer.Database
+namespace BreadPlayer.Models.Interfaces
 {
     public interface IDBRecord
     {

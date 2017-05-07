@@ -8,6 +8,6 @@ namespace BreadPlayer.Helpers.Interfaces
 {
     public interface IFilePickerHelper
     {
-        Task<Stream> PickFileAsync(IEnumerable<string> filters);
+        Task<string> PickFileAsync(IEnumerable<string> filters);
     }
 }

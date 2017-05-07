@@ -104,20 +104,12 @@
   <ItemGroup>
     <Compile Include="Common\Collections.cs" />
     <Compile Include="Common\DelegateCommand.cs" />
-    <Compile Include="Common\Enums.cs" />
     <Compile Include="Common\ICommand.cs" />
     <Compile Include="Common\PasswordStorage.cs" />
     <Compile Include="Events\MediaAboutToEndEventArgs.cs" />
     <Compile Include="Events\MediaEndedEventArgs.cs" />
     <Compile Include="Events\MediaStateChangedEventArgs.cs" />
     <Compile Include="Extensions\ObservableCollection.cs" />
-    <Compile Include="Common\IDBRecord.cs" />
-    <Compile Include="Models\Album.cs" />
-    <Compile Include="Models\EqualizerBand.cs" />
-    <Compile Include="Models\Mediafile.cs" />
-    <Compile Include="Models\Playlist.cs" />
-    <Compile Include="Models\ChildSong.cs" />
-    <Compile Include="Models\Query.cs" />
     <Compile Include="PlayerWrapper\CoreBreadPlayer.cs" />
     <Compile Include="PlayerWrapper\Effects.cs" />
     <Compile Include="PlayerWrapper\NativeMethods.cs" />
@@ -146,6 +138,10 @@
     <ProjectReference Include="..\BreadPlayer.Helpers\BreadPlayer.Helpers.csproj">
       <Project>{1bc3c477-bb82-4856-bd8a-f0deec4b25a7}</Project>
       <Name>BreadPlayer.Helpers</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BreadPlayer.Models\BreadPlayer.Models.csproj">
+      <Project>{6862b0fd-3a14-467f-8617-7975f0aab3a1}</Project>
+      <Name>BreadPlayer.Models</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />

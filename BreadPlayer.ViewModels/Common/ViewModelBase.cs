@@ -18,42 +18,27 @@
 using BreadPlayer.Core;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System;
-using Windows.UI.Core;
+using BreadPlayer.Helpers;
 
 namespace BreadPlayer.ViewModels
 {
-   public class ViewModelBase : INotifyPropertyChanged
-    {
-        NotificationManager.BreadNotificationManager notificationManager;
-        public NotificationManager.BreadNotificationManager NotificationManager
-        {
-            get { if (notificationManager == null) notificationManager = SharedLogic.NotificationManager; return notificationManager; }
-        }
+    public class ViewModelBase : INotifyPropertyChanged
+    {        
         CoreBreadPlayer player;
         public CoreBreadPlayer Player
         {
             get
             {
                 if (player == null)
-                    player = SharedLogic.Player;
+                    player = Init.SharedLogic.Player;
                 return player;
             }
         }
-        static SharedLogic logic;
-        public static SharedLogic SharedLogic
-        {
-            get
-            {
-                if (logic == null)
-                    logic = new SharedLogic();
-                return logic;
-            }
-        }
+       
         public event PropertyChangedEventHandler PropertyChanged;
         protected async virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            await SharedLogic.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            await CrossPlatformHelper.Dispatcher.RunAsync(() =>
             {
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
             });

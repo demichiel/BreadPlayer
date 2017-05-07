@@ -1,7 +1,4 @@
-﻿using BreadPlayer.Database;
-using Newtonsoft.Json;
-using System.Collections.ObjectModel;
-using System;
+﻿using BreadPlayer.Models.Interfaces;
 
 namespace BreadPlayer.Models
 {

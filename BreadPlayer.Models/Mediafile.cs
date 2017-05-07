@@ -15,8 +15,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-using BreadPlayer.Core;
-using BreadPlayer.Database;
+using BreadPlayer.Models.Common;
+using BreadPlayer.Models.Interfaces;
 using Newtonsoft.Json;
 using System;
 

@@ -20,8 +20,8 @@ using ManagedBass;
 using ManagedBass.Fx;
 using System.Collections.ObjectModel;
 using System.Linq;
-using BreadPlayer.Core.Models;
 using BreadPlayer.Helpers;
+using BreadPlayer.Models;
 
 namespace BreadPlayer.Core
 {

@@ -96,14 +96,8 @@
     <Compile Include="Messenger\Messenger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service\GenericService.cs" />
-    <Compile Include="ViewModels\BaseClasses\BaseViewData.cs" />
-    <Compile Include="ViewModels\BaseClasses\BaseViewModel.cs" />
-    <Compile Include="ViewModels\BaseClasses\IView.cs" />
-    <Compile Include="ViewModels\BaseClasses\ObservableObject.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Interfaces\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\BreadPlayer.Helpers\BreadPlayer.Helpers.csproj">
       <Project>{1bc3c477-bb82-4856-bd8a-f0deec4b25a7}</Project>

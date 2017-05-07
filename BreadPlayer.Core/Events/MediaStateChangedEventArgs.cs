@@ -17,13 +17,14 @@
 */
 using System;
 using BreadPlayer.Core;
+using BreadPlayer.Models.Common;
 
 namespace BreadPlayer.Events
 {
 
 	public class MediaStateChangedEventArgs : EventArgs
     {
-        private BreadPlayer.Core.PlayerState newState;
+        private PlayerState newState;
         public MediaStateChangedEventArgs(PlayerState NewState)
         {
             newState = NewState;

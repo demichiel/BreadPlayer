@@ -10,5 +10,6 @@
     <ProjectReference Include="..\BreadPlayer.Extensions\BreadPlayer.Extensions.csproj" />
     <ProjectReference Include="..\BreadPlayer.Framework\BreadPlayer.Framework.csproj" />
     <ProjectReference Include="..\BreadPlayer.Helpers\BreadPlayer.Helpers.csproj" />
+    <ProjectReference Include="..\BreadPlayer.Web\BreadPlayer.Web.csproj" />
   </ItemGroup>
 </Project>

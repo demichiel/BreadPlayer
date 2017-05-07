@@ -27,6 +27,8 @@ using BreadPlayer.Helpers;
 using BreadPlayer.Messengers;
 using BreadPlayer.Database;
 using System.Reflection;
+using BreadPlayer.Models.Common;
+using BreadPlayer.Helpers.Interfaces;
 
 namespace BreadPlayer.ViewModels
 {
@@ -40,7 +42,7 @@ namespace BreadPlayer.ViewModels
         private Mediafile _songToStopAfter;
         DispatcherTimer timer;
         UndoRedoStack<Mediafile> history = new UndoRedoStack<Mediafile>();
-        LibraryService service = new LibraryService(new KeyValueStoreDatabaseService(Core.SharedLogic.DatabasePath, "Tracks", "TracksText"));
+        LibraryService service = new LibraryService(new KeyValueStoreDatabaseService(Init.SharedLogic.DatabasePath, "Tracks", "TracksText"));
         int SongCount = 0;
         #endregion
 
@@ -70,7 +72,7 @@ namespace BreadPlayer.ViewModels
             Player.MediaEnded += Player_MediaEnded;
             this.PropertyChanged += ShellViewModel_PropertyChanged;
             Player.MediaAboutToEnd += Player_MediaAboutToEnd;
-        }
+        }       
         #endregion
 
         #region HandleMessages
@@ -136,7 +138,7 @@ namespace BreadPlayer.ViewModels
                         volume = CrossPlatformHelper.SettingsHelper.GetSetting<double>("volume", 50.0);
                     else
                         volume = (double)list[3];
-                    await Load(await SharedLogic.CreateMediafile(list[0] as StorageFile), (bool)list[2], (double)list[1], volume);
+                    await Load(await Init.SharedLogic.CreateMediafile(list[0].ToString()), (bool)list[2], (double)list[1], volume);
                 }
                 else
                     this.GetType().GetTypeInfo().GetDeclaredMethod(message.Payload as string)?.Invoke(this, new object[] { });
@@ -277,7 +279,7 @@ namespace BreadPlayer.ViewModels
             }
             catch (Exception ex)
             {
-                await NotificationManager.ShowMessageAsync("Some error occured while playing the song. ERROR INFO: " + ex.Message);
+                await CrossPlatformHelper.NotificationManager.ShowMessageAsync("Some error occured while playing the song. ERROR INFO: " + ex.Message);
             }
         }
         private void SetNowPlayingSong()
@@ -330,7 +332,7 @@ namespace BreadPlayer.ViewModels
                 catch (Exception ex)
                 {
                     CrossPlatformHelper.Log.E("An error occured while trying to play next song.", ex);
-                    await NotificationManager.ShowMessageAsync("An error occured while trying to play next song. Trying again...");
+                    await CrossPlatformHelper.NotificationManager.ShowMessageAsync("An error occured while trying to play next song. Trying again...");
                     TracksCollection?.Elements.Where(t => t.State == PlayerState.Playing).ToList().ForEach(new Action<Mediafile>((Mediafile file) => { file.State = PlayerState.Stopped; }));
                     PlaylistSongCollection?.Where(t => t.State == PlayerState.Playing).ToList().ForEach(new Action<Mediafile>((Mediafile file) => { file.State = PlayerState.Stopped; }));
                     PlayNext();
@@ -393,10 +395,10 @@ namespace BreadPlayer.ViewModels
         {
             var FileTypeFilters = new List<string>() { ".mp3", ".wav", ".ogg",
                 ".flac",".m4a",".aif",".wma" };
-            var fileStream = CrossPlatformHelper.FilePickerHelper.PickFileAsync(FileTypeFilters);            
-            if (fileStream != null)
+            var filePath = await CrossPlatformHelper.FilePickerHelper.PickFileAsync(FileTypeFilters);            
+            if (filePath != null)
             {
-                var mp3file = await SharedLogic.CreateMediafile(file, true);
+                var mp3file = await Init.SharedLogic.CreateMediafile(filePath, true);
                 if (Player.PlayerState == PlayerState.Paused || Player.PlayerState == PlayerState.Stopped)
                     await Load(mp3file);
                 else
@@ -414,8 +416,8 @@ namespace BreadPlayer.ViewModels
         {
             if (UpcomingSong == null)
                 UpcomingSong = await GetUpcomingSong(true);
-            NotificationManager.SendUpcomingSongNotification(UpcomingSong);
-            await NotificationManager.ShowMessageAsync("Upcoming Song: " + UpcomingSong.Title + " by " + UpcomingSong.LeadArtist, 15);
+            CrossPlatformHelper.NotificationManager.SendUpcomingSongNotification(UpcomingSong);
+            await CrossPlatformHelper.NotificationManager.ShowMessageAsync("Upcoming Song: " + UpcomingSong.Title + " by " + UpcomingSong.LeadArtist, 15);
         }
 
         private async void ShellViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -597,13 +599,13 @@ namespace BreadPlayer.ViewModels
         #region Methods
         private async Task ScrobblePlayingSong()
         {
-            if (SharedLogic.LastfmScrobbler != null)
+            if (Init.SharedLogic.LastfmScrobbler != null)
             {
-                var scrobble = await SharedLogic.LastfmScrobbler.Scrobble(Player.CurrentlyPlayingFile.LeadArtist, Player.CurrentlyPlayingFile.Album, Player.CurrentlyPlayingFile.Title);
+                var scrobble = await Init.SharedLogic.LastfmScrobbler.Scrobble(Player.CurrentlyPlayingFile.LeadArtist, Player.CurrentlyPlayingFile.Album, Player.CurrentlyPlayingFile.Title);
                 if (scrobble.Success)
-                    await NotificationManager.ShowMessageAsync("Song successfully scrobbled.", 4);
+                    await CrossPlatformHelper.NotificationManager.ShowMessageAsync("Song successfully scrobbled.", 4);
                 else
-                    await NotificationManager.ShowMessageBoxAsync(string.Format("Failed to scrobble this song due to {0}. Exception details: {1}.", scrobble.Status.ToString(), scrobble?.Exception?.Message), "Failed to scrobble this song");
+                    await CrossPlatformHelper.NotificationManager.ShowMessageBoxAsync(string.Format("Failed to scrobble this song due to {0}. Exception details: {1}.", scrobble.Status.ToString(), scrobble?.Exception?.Message), "Failed to scrobble this song");
             }
         }
       
