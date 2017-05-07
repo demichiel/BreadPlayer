@@ -16,5 +16,6 @@ namespace BreadPlayer.Helpers.Interfaces
         ICommand OpenSongLocationCommand { get; }
         ICommand ChangeAlbumArtCommand { get; }
         string DatabasePath { get; }
+        ThreadSafeObservableCollection<ContextMenuCommand> OptionItems { get;}
     }
 }

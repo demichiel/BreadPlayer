@@ -14,6 +14,8 @@ namespace BreadPlayer.Helpers
         public static SettingsHelper SettingsHelper { get; set; }
         public static IWindowHelper WindowHelper { get; set; }
         public static IFilePickerHelper FilePickerHelper { get; set; }
-        public static IThemeManager ThemeManager { get; set; }       
+        public static IThemeManager ThemeManager { get; set; }      
+        public static ICustomViewSource CustomViewSource { get; set; }
+        public static IPlaylistHelper PlaylistHelper { get; set; }
     }
 }

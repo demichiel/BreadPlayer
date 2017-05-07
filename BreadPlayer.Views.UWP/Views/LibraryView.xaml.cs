@@ -22,6 +22,12 @@ using Windows.UI.Xaml.Navigation;
 using BreadPlayer.ViewModels;
 using Windows.ApplicationModel.DataTransfer;
 using BreadPlayer.Models;
+using System.IO;
+using Windows.Storage;
+using System.Collections.Generic;
+using BreadPlayer.Helpers;
+using BreadPlayer.Messengers;
+using Windows.UI.Xaml.Data;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -34,10 +40,48 @@ namespace BreadPlayer
     {
         public LibraryView()
         {
+            CrossPlatformHelper.CustomViewSource = new CustomViewSource((Grid.Resources["Source"] as CollectionViewSource));
             this.InitializeComponent();
             this.NavigationCacheMode = NavigationCacheMode.Required;
         }
-        
+        private async void fileBox_Drop(object sender, DragEventArgs e)
+        {
+            //if (e.DataView.Contains(StandardDataFormats.StorageItems))
+            //{
+            //    var items = await e.DataView.GetStorageItemsAsync();
+            //    if (items.Any())
+            //    {
+            //        foreach (var item in items)
+            //        {
+            //            if (item.IsOfType(StorageItemTypes.File) && Path.GetExtension(item.Path) == ".mp3")
+            //            {
+            //                Mediafile mp3file = null;
+            //                string path = item.Path;
+            //                var tempList = new List<Mediafile>();
+            //                if (TracksCollection.Elements.All(t => t.Path != path))
+            //                {
+            //                    try
+            //                    {
+            //                        mp3file = await ViewModels.Init.SharedLogic.CreateMediafile((item as StorageFile).Path);
+            //                        await SettingsViewModel.SaveSingleFileAlbumArtAsync(mp3file).ConfigureAwait(false);
+            //                        SharedLogic.AddMediafile(mp3file);
+            //                    }
+            //                    catch (Exception ex)
+            //                    {
+            //                        CrossPlatformHelper.Log.E("Error occured while drag/drop operation.", ex);
+            //                    }
+            //                }
+            //            }
+            //            else if (item.IsOfType(StorageItemTypes.Folder))
+            //            {
+            //                await Init.SharedLogic.SettingsVM.AddFolderToLibraryAsync((item as StorageFolder).CreateFileQueryWithOptions(DirectoryWalker.GetQueryOptions()));
+            //            }
+
+            //        }
+            //        Messenger.Instance.NotifyColleagues(MessageTypes.MSG_ADD_ALBUMS, "");
+            //    }
+            //}
+        }
         private void fileBox_DragOver(object sender, DragEventArgs e)
         {
             e.AcceptedOperation = DataPackageOperation.Copy;
@@ -68,6 +112,7 @@ namespace BreadPlayer
             }
             catch { }
         }
-        
+
+       
     }
 }

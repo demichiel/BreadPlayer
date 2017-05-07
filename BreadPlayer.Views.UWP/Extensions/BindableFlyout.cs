@@ -96,29 +96,6 @@ namespace BreadPlayer.Extensions
             Setup(this);
         }
     }
-
-    public class ContextMenuCommand : ObservableObject
-    {
-        public ContextMenuCommand(ICommand command, string text, object cmdPara = null)
-        {
-            Command = command;
-            Text = text;
-            CommandParameter = cmdPara;
-        }
-        string text;
-        public string Text
-        {
-            get { return text; } set { Set(ref text, value); }
-        }
-        public ICommand Command
-        {
-            get; private set;
-        }
-        public object CommandParameter
-        {
-            get; private set;
-        }
-    }
     public class CustomFlyout : MenuFlyout
     {
         public object Tag
@@ -151,7 +128,7 @@ namespace BreadPlayer.Extensions
             {
                 await SharedLogic.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                 {
-                    SharedLogic.OptionItems.CollectionChanged += OptionItems_CollectionChanged;
+                    ViewModels.Init.SharedLogic.OptionItems.CollectionChanged += OptionItems_CollectionChanged;
                     menuFlyout.Items.Clear();
                     MenuFlyoutSubItem addTo = new MenuFlyoutSubItem() { Text = "Add to" };
                     MenuFlyoutItem properties = new MenuFlyoutItem() { Text = "Properties", Command = core.ShowPropertiesCommand, CommandParameter = null };
@@ -162,7 +139,7 @@ namespace BreadPlayer.Extensions
                     menuFlyout.Items.Add(changeAlbumArt);
                     menuFlyout.Items.Add(openLoc);
                     menuFlyout.Items.Add(properties);
-                    foreach (var menuItem in SharedLogic.OptionItems)
+                    foreach (var menuItem in ViewModels.Init.SharedLogic.OptionItems)
                     {
                         var item = new MenuFlyoutItem()
                         {

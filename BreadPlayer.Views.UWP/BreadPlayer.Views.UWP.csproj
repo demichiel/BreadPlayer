@@ -159,9 +159,9 @@
     <Compile Include="Events\ThemeChangedEventArgs.cs" />
     <Compile Include="Extensions\SolidColorBrushExtensions.cs" />
     <Compile Include="Extensions\DependencyObjectExtensions.cs" />
-    <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Extensions\TextBlockExtensions.cs" />
     <Compile Include="HamburgerMenu\Shortcut.cs" />
+    <Compile Include="Helpers\CustomViewSource.cs" />
     <Compile Include="Helpers\FilePickerHelper.cs" />
     <Compile Include="Helpers\LockscreenHelper.cs" />
     <Compile Include="Dialogs\InputDialog.xaml.cs">
@@ -173,6 +173,7 @@
     <Compile Include="Extensions\BindableFlyout.cs" />
     <Compile Include="Extensions\VisualTreeHelperExtensions.cs" />
     <Compile Include="Common\UndoRedoStack.cs" />
+    <Compile Include="Helpers\PlaylistHelper.cs" />
     <Compile Include="Helpers\SliderHelper.cs" />
     <Compile Include="Helpers\WindowHelper.cs" />
     <Compile Include="PlaylistBus\IPlaylist.cs" />
@@ -186,7 +187,6 @@
     <Compile Include="Themes\ThemeManager.cs" />
     <Compile Include="ViewModels\AccountsViewModel.cs" />
     <Compile Include="ViewModels\AlbumArtistViewModel.cs" />
-    <Compile Include="ViewModels\LibraryViewModel.cs" />
     <Compile Include="ViewModels\NowPlayingViewModel.cs" />
     <Compile Include="ViewModels\PlaylistViewModel.cs" />
     <Compile Include="ViewModels\SearchResultsViewModel.cs" />
