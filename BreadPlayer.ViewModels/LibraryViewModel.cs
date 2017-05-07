@@ -193,7 +193,6 @@ namespace BreadPlayer.ViewModels
             set { Set(ref playlistService, value); }
         }
       
-        ICustomViewSource viewSource;
         public ICustomViewSource ViewSource
         {
             get { return CrossPlatformHelper.CustomViewSource; }
@@ -295,7 +294,7 @@ namespace BreadPlayer.ViewModels
         /// </summary>
         public ThreadSafeObservableCollection<string> GenreCollection
         {
-            get { return _GenreCollection; }
+            get { if (_GenreCollection == null) _GenreCollection = new ThreadSafeObservableCollection<string>(); return _GenreCollection; }
             set { Set(ref _GenreCollection, value); }
         }
         bool isLibraryLoading;
@@ -496,11 +495,11 @@ namespace BreadPlayer.ViewModels
 
             await RefreshSourceAsync().ConfigureAwait(false);
 
-            if (source == null && Sort != "Unsorted")
+            if (source == null && Sort != null && Sort != "Unsorted")
             {
                 await LoadCollectionAsync(GetSortFunction(Sort), true).ConfigureAwait(false);
             }
-            else if (source == null && Sort == "Unsorted")
+            else if (source == null && Sort == "Unsorted" || Sort == null)
             {
                 await LoadCollectionAsync(GetSortFunction("FolderPath"), false).ConfigureAwait(false);
             }
@@ -693,6 +692,9 @@ namespace BreadPlayer.ViewModels
         }
         Func<Mediafile, string> GetSortFunction(string propName)
         {
+            if (propName == null)
+                propName = "FolderPath";
+
             Func<Mediafile, string> f = null;
             switch (propName)
             {
@@ -770,7 +772,7 @@ namespace BreadPlayer.ViewModels
       
         private void GetSettings()
         {
-            Sort = CrossPlatformHelper.SettingsHelper.GetSetting<string>("Sort", "Unsorted");
+            Sort = CrossPlatformHelper.SettingsHelper.GetSetting<string>("Sort", "Unsorted") ?? "Unsorted";
         }
         
         #endregion

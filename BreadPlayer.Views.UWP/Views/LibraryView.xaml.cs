@@ -28,6 +28,7 @@ using System.Collections.Generic;
 using BreadPlayer.Helpers;
 using BreadPlayer.Messengers;
 using Windows.UI.Xaml.Data;
+using BreadPlayer.Services;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -40,10 +41,18 @@ namespace BreadPlayer
     {
         public LibraryView()
         {
-            CrossPlatformHelper.CustomViewSource = new CustomViewSource((Grid.Resources["Source"] as CollectionViewSource));
             this.InitializeComponent();
+            CrossPlatformHelper.CustomViewSource = new CustomViewSource((Grid.Resources["Source"] as CollectionViewSource));
             this.NavigationCacheMode = NavigationCacheMode.Required;
+           // NavigationService.Instance.Frame.Navigated += Frame_Navigated;
         }
+
+        private void Frame_Navigated(object sender, NavigationEventArgs e)
+        {
+            if(e.SourcePageType == typeof(LibraryView))
+                Messenger.Instance.NotifyColleagues(MessageTypes.MSG_LIBRARY_NAVIGATE, e.Parameter ?? "MusicCollection");
+        }
+
         private async void fileBox_Drop(object sender, DragEventArgs e)
         {
             //if (e.DataView.Contains(StandardDataFormats.StorageItems))
