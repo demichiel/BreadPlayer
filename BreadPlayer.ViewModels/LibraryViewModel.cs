@@ -294,13 +294,13 @@ namespace BreadPlayer.ViewModels
             }
         }
 
-        ThreadSafeObservableCollection<string> _GenreCollection;
+        ThreadSafeObservableCollection<ContextMenuCommand> _GenreCollection;
         /// <summary>
         /// Gets or Sets a flyout for genres. This is a dynamic control bound to <see cref="LibraryView"/>.
         /// </summary>
-        public ThreadSafeObservableCollection<string> GenreCollection
+        public ThreadSafeObservableCollection<ContextMenuCommand> GenreCollection
         {
-            get { if (_GenreCollection == null) _GenreCollection = new ThreadSafeObservableCollection<string>(); return _GenreCollection; }
+            get { if (_GenreCollection == null) _GenreCollection = new ThreadSafeObservableCollection<ContextMenuCommand>(); return _GenreCollection; }
             set { Set(ref _GenreCollection, value); }
         }
         bool isLibraryLoading;
@@ -779,12 +779,19 @@ namespace BreadPlayer.ViewModels
         {
             await CrossPlatformHelper.Dispatcher.RunAsync(() =>
             {
-                GenreCollection.Add("All genres");
+                GenreCollection.Add(CreateGenreItem("All genres"));
                 var genres = TracksCollection.Elements.GroupBy(t => t.Genre).Where(t=> t.Key != "NaN").DistinctBy(t => t.Key);
-                GenreCollection.AddRange(genres.Select(t => t.Key));               
+                foreach(var genre in genres)
+                {
+                    GenreCollection.Add(CreateGenreItem(genre.Key));
+                }             
             });
         }
-      
+        ContextMenuCommand CreateGenreItem(string genre)
+        {
+            var item = new ContextMenuCommand(FilterByGenreCommand, genre, genre);
+            return item;
+        }
         private void GetSettings()
         {
             Sort = CrossPlatformHelper.SettingsHelper.GetSetting<string>("Sort", "Unsorted") ?? "Unsorted";
