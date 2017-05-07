@@ -1,7 +1,7 @@
 ﻿using BreadPlayer.Core.Common;
 using Windows.Storage;
 
-namespace BreadPlayer.Common
+namespace BreadPlayer.Helpers
 {
     public class RoamingSettingsHelper : IEqualizerSettingsHelper
     {

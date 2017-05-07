@@ -64,7 +64,7 @@ namespace BreadPlayer.ViewModels
             
             Player.PlayerState = PlayerState.Stopped;
             DontUpdatePosition = false;
-            this.timer = new DispatcherTimer(new BreadPlayer.Dispatcher.BreadDispatcher(SharedLogic.Dispatcher));
+            this.timer = new DispatcherTimer(CrossPlatformHelper.Dispatcher);
             timer.Interval = TimeSpan.FromMilliseconds(500);
             timer.Tick += Timer_Tick;
             this.timer.Stop();
@@ -134,7 +134,7 @@ namespace BreadPlayer.ViewModels
                 {
                     double volume = 0;
                     if ((double)list[3] == 50.0)
-                        volume = RoamingSettingsHelper.GetSetting<double>("volume", 50.0);
+                        volume = CrossPlatformHelper.SettingsHelper.GetSetting<double>("volume", 50.0);
                     else
                         volume = (double)list[3];
                     await Load(await SharedLogic.CreateMediafile(list[0] as StorageFile), (bool)list[2], (double)list[1], volume);
@@ -222,12 +222,15 @@ namespace BreadPlayer.ViewModels
         private void NavigateToNowPlayingView()
         {
             IsPlaybarHidden = true;
-            ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
+            CrossPlatformHelper.WindowHelper.EnterFullscreen();
         }
         private void ShowEqualizer()
         {
             IsEqualizerVisible = IsEqualizerVisible ? false : true;
-            DisplayInformation.AutoRotationPreferences = DisplayInformation.AutoRotationPreferences == DisplayOrientations.Landscape ? DisplayOrientations.Portrait : DisplayOrientations.Landscape;
+            if (CrossPlatformHelper.WindowHelper.GetOrientation() == "Landscape")
+                CrossPlatformHelper.WindowHelper.RotateLandscape();
+            else
+                CrossPlatformHelper.WindowHelper.RotatePotrait();
         }
         void SetRepeat()
         {
@@ -280,7 +283,7 @@ namespace BreadPlayer.ViewModels
         }
         private void SetNowPlayingSong()
         {
-            string path = RoamingSettingsHelper.GetSetting<string>("path", "");
+            string path = CrossPlatformHelper.SettingsHelper.GetSetting<string>("path", "");
             if (!TracksCollection.Elements.Any(t => t.Path == path && t.State == PlayerState.Playing))
             {
                 if (TracksCollection.Elements.Any(t => t.State == PlayerState.Playing))
@@ -389,21 +392,10 @@ namespace BreadPlayer.ViewModels
         }
         async void Open(object para)
         {
-            var picker = new FileOpenPicker();
-            FileOpenPicker openPicker = new FileOpenPicker()
-            {
-                ViewMode = PickerViewMode.Thumbnail,
-                SuggestedStartLocation = PickerLocationId.MusicLibrary
-            };
-            openPicker.FileTypeFilter.Add(".mp3");
-            openPicker.FileTypeFilter.Add(".wav");
-            openPicker.FileTypeFilter.Add(".ogg");
-            openPicker.FileTypeFilter.Add(".flac");
-            openPicker.FileTypeFilter.Add(".m4a");
-            openPicker.FileTypeFilter.Add(".aif");
-            openPicker.FileTypeFilter.Add(".wma");
-            StorageFile file = await openPicker.PickSingleFileAsync();
-            if (file != null)
+            var FileTypeFilters = new List<string>() { ".mp3", ".wav", ".ogg",
+                ".flac",".m4a",".aif",".wma" };
+            var fileStream = CrossPlatformHelper.FilePickerHelper.PickFileAsync(FileTypeFilters);            
+            if (fileStream != null)
             {
                 var mp3file = await SharedLogic.CreateMediafile(file, true);
                 if (Player.PlayerState == PlayerState.Paused || Player.PlayerState == PlayerState.Stopped)
@@ -413,7 +405,6 @@ namespace BreadPlayer.ViewModels
                     await Load(mp3file, true);
                 }
             }
-
         }
         #endregion
 
@@ -536,7 +527,7 @@ namespace BreadPlayer.ViewModels
             set
             {
                 Set(ref _repeat, value);
-                ApplicationData.Current.RoamingSettings.Values["Repeat"] = Repeat;
+                CrossPlatformHelper.SettingsHelper.SaveSetting("Repeat", _repeat);
             }
         }
        
@@ -547,7 +538,7 @@ namespace BreadPlayer.ViewModels
             set
             {
                 Set(ref _shuffle, value);
-                ApplicationData.Current.RoamingSettings.Values["Shuffle"] = Shuffle;
+                CrossPlatformHelper.SettingsHelper.SaveSetting("Shuffle", _shuffle);
             }
         }
 
@@ -619,8 +610,8 @@ namespace BreadPlayer.ViewModels
       
         private void GetSettings()
         {
-            Shuffle = RoamingSettingsHelper.GetSetting<bool>("Shuffle", false);
-            Repeat = RoamingSettingsHelper.GetSetting<string>("Repeat", "No Repeat");
+            Shuffle = CrossPlatformHelper.SettingsHelper.GetSetting<bool>("Shuffle", false);
+            Repeat = CrossPlatformHelper.SettingsHelper.GetSetting<string>("Repeat", "No Repeat");
         }
         async Task PlayFile(Mediafile toPlayFile, bool play = false)
         {
@@ -679,11 +670,13 @@ namespace BreadPlayer.ViewModels
         }
         private async Task UpdateUI(Mediafile mediaFile)
         {
-            Themes.ThemeManager.SetThemeColor(Player.CurrentlyPlayingFile.AttachedPicture);
-            CoreWindowLogic.UpdateSmtc();
-            CoreWindowLogic.UpdateTile(mediaFile);
-            if (SharedLogic.SettingsVM.ReplaceLockscreenWithAlbumArt)
-                await LockscreenHelper.ChangeLockscreenImage(mediaFile);
+            CrossPlatformHelper.ThemeManager.SetThemeColor(Player.CurrentlyPlayingFile.AttachedPicture);
+            //PLATFORM-SPECIFIC LOGIC!
+            //TODO: Remove this to TrackLoadedEvent.
+            //CoreWindowLogic.UpdateSmtc();
+            //CoreWindowLogic.UpdateTile(mediaFile);
+            //if (SharedLogic.SettingsVM.ReplaceLockscreenWithAlbumArt)
+            //    await LockscreenHelper.ChangeLockscreenImage(mediaFile);
             UpcomingSong = await GetUpcomingSong();
         }
         public async Task Load(Mediafile mp3file, bool play = false, double currentPos = 0, double vol = 50)

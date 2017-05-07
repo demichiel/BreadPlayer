@@ -23,10 +23,12 @@ using BreadPlayer.Models;
 using BreadPlayer.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
 using Windows.Graphics.Display;
 using Windows.Storage;
+using Windows.Storage.Pickers;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -58,10 +60,11 @@ namespace BreadPlayer
                 ShortcutCommand = (App.Current.Resources["LibVM"] as LibraryViewModel).ChangeSelectionModeCommand,
             });
             NowPlayingItem.Command = ShellVM.NavigateToNowPlayingViewCommand;
+           
         }
            
         protected async override void OnNavigatedTo(NavigationEventArgs e)
-        {
+        {           
             Window.Current.CoreWindow.KeyDown += (sender, args) =>
             GlobalPageKeyDown?.Invoke(sender, args);
             if (RoamingSettingsHelper.GetSetting<bool>("IsFirstTime", true))
