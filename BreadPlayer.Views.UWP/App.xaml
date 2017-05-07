@@ -1381,7 +1381,7 @@ Control.IsTemplateFocusTarget="True"/>
                                             </Core:EventTriggerBehavior>
                                             <Core:EventTriggerBehavior EventName="Tapped">
                                                 <Core:EventTriggerBehavior.Actions>
-                                                    <Core:CallMethodAction MethodName="PlayOnTap" TargetObject="{StaticResource LibVM}"></Core:CallMethodAction>
+                                                    <Core:InvokeCommandAction CommandParameter="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=Content}" Command="{Binding Source={StaticResource LibVM},Path=PlayOnTapCommand}"></Core:InvokeCommandAction>
                                                 </Core:EventTriggerBehavior.Actions>
                                             </Core:EventTriggerBehavior>
                                             <Core:EventTriggerBehavior EventName="Holding">

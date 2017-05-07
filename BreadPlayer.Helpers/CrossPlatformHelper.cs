@@ -17,5 +17,6 @@ namespace BreadPlayer.Helpers
         public static IThemeManager ThemeManager { get; set; }      
         public static ICustomViewSource CustomViewSource { get; set; }
         public static IPlaylistHelper PlaylistHelper { get; set; }
+        public static IDeviceHelper DeviceHelper { get; set; }
     }
 }

@@ -131,7 +131,7 @@
   <ItemGroup>
     <Compile Include="Behaviours\InvokeCommondOnKeyDown.cs" />
     <Compile Include="Behaviours\ItemClickedBehaviour.cs" />
-    <Compile Include="Behaviours\ListViewFocusBeforeSelectBehaviour.cs" />
+    <Compile Include="Behaviours\ListViewService.cs" />
     <Compile Include="Behaviours\OpenMenuBehaviour.cs" />
     <Compile Include="Common\BackDrop.cs" />
     <Compile Include="Common\DeviceInfoHelper.cs" />
@@ -162,6 +162,7 @@
     <Compile Include="Extensions\TextBlockExtensions.cs" />
     <Compile Include="HamburgerMenu\Shortcut.cs" />
     <Compile Include="Helpers\CustomViewSource.cs" />
+    <Compile Include="Helpers\DeviceHelper.cs" />
     <Compile Include="Helpers\FilePickerHelper.cs" />
     <Compile Include="Helpers\LockscreenHelper.cs" />
     <Compile Include="Dialogs\InputDialog.xaml.cs">

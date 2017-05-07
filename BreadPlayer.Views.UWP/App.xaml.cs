@@ -63,6 +63,7 @@ namespace BreadPlayer
             CrossPlatformHelper.FilePickerHelper = new FilePickerHelper();
             CrossPlatformHelper.WindowHelper = new WindowHelper();
             CrossPlatformHelper.PlaylistHelper = new PlaylistHelper();
+            CrossPlatformHelper.DeviceHelper = new DeviceHelper();
 
             Init.SharedLogic = new SharedLogic();
             Logger.I("Logger initialized. Progressing in app constructor.");

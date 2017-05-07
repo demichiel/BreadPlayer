@@ -155,6 +155,12 @@ namespace BreadPlayer.ViewModels
         #endregion
 
         #region Properties  
+        List<Mediafile> selectedItems = new List<Mediafile>();
+        public List<Mediafile> SelectedItems
+        {
+            get => selectedItems;
+            set => Set(ref selectedItems, value);
+        }
         string status = "Loading Library...";
         public string Status
         {
@@ -313,6 +319,7 @@ namespace BreadPlayer.ViewModels
         #region Definitions
         RelayCommand _deleteCommand;
         RelayCommand _playCommand;
+        RelayCommand _playOnTapCommand;
         RelayCommand _stopAfterCommand;
         RelayCommand _addtoplaylistCommand;   
         RelayCommand _sortByCommand;
@@ -375,7 +382,14 @@ namespace BreadPlayer.ViewModels
             get
             { if (_playCommand == null) { _playCommand = new RelayCommand(param => this.Play(param)); } return _playCommand; }
         }
-        
+        /// <summary>
+        /// Gets Play command. This calls the <see cref="Play(object)"/> method. <seealso cref="ICommand"/>
+        /// </summary>
+        public ICommand PlayOnTapCommand
+        {
+            get
+            { if (_playOnTapCommand == null) { _playOnTapCommand = new RelayCommand(param => this.PlayOnTap(param)); } return _playOnTapCommand; }
+        }
         /// <summary>
         /// Gets Stop command. This calls the <see cref="StopAfter(object)"/> method. <seealso cref="ICommand"/>
         /// </summary>
@@ -396,6 +410,13 @@ namespace BreadPlayer.ViewModels
         #endregion
 
         #region Implementations 
+        private void PlayOnTap(object para)
+        {
+            if (CrossPlatformHelper.DeviceHelper.IsDeviceTouchEnabled() && !IsMultiSelectModeEnabled)
+            {
+                Play(para);
+            }
+        }
         private async void AddToFavorites(object para)
         {
             var mediaFile = para as Mediafile;
@@ -964,29 +985,8 @@ namespace BreadPlayer.ViewModels
             {
                 RecentlyPlayedCollection.RemoveAt(RecentlyPlayedCollection.Count + 1);
             }
-        }     
-
-        //public void PlayOnTap(object sender, TappedRoutedEventArgs e)
-        //{
-        //    if (e.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Touch && !IsMultiSelectModeEnabled)
-        //    {
-        //        Play((e.OriginalSource as Border).Tag);
-        //    }
-        //}
-        public List<Mediafile> SelectedItems { get; set; } = new List<Mediafile>();
-
-        //public void SelectionChanged(object para, SelectionChangedEventArgs selectionEvent)
-        //{
-        //    if (selectionEvent.RemovedItems.Count > 0)
-        //    {
-        //        foreach (var toRemove in selectionEvent.RemovedItems.Cast<Mediafile>())
-        //        {
-        //            SelectedItems.Remove(toRemove);
-        //        }
-        //    }
-        //    if (selectionEvent.AddedItems.Count > 0)
-        //        SelectedItems.AddRange(selectionEvent.AddedItems.Cast<Mediafile>().ToList());
-        //}
+        }
+     
         #endregion
 
         public event OnMusicLibraryLoaded MusicLibraryLoaded;

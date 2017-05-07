@@ -109,7 +109,19 @@
        
         <SemanticZoom x:Name="semanticZoom" ViewChangeStarted="semanticZoom_ViewChangeStarted" Grid.Row="2" Grid.ColumnSpan="2" ScrollViewer.ZoomMode="Enabled">
             <SemanticZoom.ZoomedInView>
-                <BPControls:AlternatingRowListView x:Name="fileBox" OddRowBackground="{ThemeResource OddRowBackground}" EvenRowBackground="{ThemeResource EvenRowBackground}"  AllowDrop="True" Opacity="0" IsMultiSelectCheckBoxEnabled="True" Behaviours:ListViewService.FocusBeforeSelect="True" SelectionMode="{Binding Path=IsMultiSelectModeEnabled, Converter={StaticResource BoolToSelectionMode}, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IncrementalLoadingThreshold="50" IncrementalLoadingTrigger="Edge" DataFetchSize="50" ScrollViewer.IsScrollInertiaEnabled="True" ScrollViewer.VerticalScrollBarVisibility="Auto" ItemContainerStyle="{StaticResource ListViewItemExpanded}" ItemsSource="{Binding Source={StaticResource Source}, UpdateSourceTrigger=Explicit}" Grid.Row="2" Grid.ColumnSpan="2" DragOver="fileBox_DragOver" Drop="fileBox_Drop">
+                <BPControls:AlternatingRowListView x:Name="fileBox" OddRowBackground="{ThemeResource OddRowBackground}" 
+                                                   EvenRowBackground="{ThemeResource EvenRowBackground}" 
+                                                   AllowDrop="True" Opacity="0" IsMultiSelectCheckBoxEnabled="True" 
+                                                   Behaviours:ListViewService.FocusBeforeSelect="True"
+                                                   Behaviours:ListViewService.SelectedItems="{Binding Path=SelectedItems, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                   SelectionMode="{Binding Path=IsMultiSelectModeEnabled, Converter={StaticResource BoolToSelectionMode}, UpdateSourceTrigger=PropertyChanged}"
+                                                   SelectedItem="{Binding SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                                   IncrementalLoadingThreshold="50" IncrementalLoadingTrigger="Edge" 
+                                                   DataFetchSize="50" ScrollViewer.IsScrollInertiaEnabled="True" 
+                                                   ScrollViewer.VerticalScrollBarVisibility="Auto" 
+                                                   ItemContainerStyle="{StaticResource ListViewItemExpanded}" 
+                                                   ItemsSource="{Binding Source={StaticResource Source}, UpdateSourceTrigger=Explicit}" 
+                                                   Grid.Row="2" Grid.ColumnSpan="2" DragOver="fileBox_DragOver" Drop="fileBox_Drop">
                     <BPControls:AlternatingRowListView.ItemsPanel>
                         <ItemsPanelTemplate >
                             <ItemsStackPanel Orientation="Vertical">
@@ -135,12 +147,12 @@
                                 <Behaviours:InvokeCommandByKeyDown CommandParameter="{Binding ElementName=fileBox, Path=SelectedItem}" Command="{Binding Path=AddToFavoritesCommand}" PressedKey="F" DoubleKeyCommand="True"/>
                             </Core:EventTriggerBehavior.Actions>
                         </Core:EventTriggerBehavior>
-                        <Core:EventTriggerBehavior EventName="SelectionChanged">
+                        <!--<Core:EventTriggerBehavior EventName="SelectionChanged">
                             <Core:EventTriggerBehavior.Actions>
                                 <Core:CallMethodAction MethodName="SelectionChanged" TargetObject="{Binding Source={StaticResource LibVM}}"/>
-                                <!--<Core:InvokeCommandAction  CommandParameter="{Binding ElementName=fileBox}" Command="{Binding SelectionChangedCommand}"/>-->
+                                --><!--<Core:InvokeCommandAction  CommandParameter="{Binding ElementName=fileBox}" Command="{Binding SelectionChangedCommand}"/>--><!--
                             </Core:EventTriggerBehavior.Actions>
-                        </Core:EventTriggerBehavior>
+                        </Core:EventTriggerBehavior>-->
                         <Core:EventTriggerBehavior EventName="Drop">
                             <Core:CallMethodAction MethodName="DropFiles" TargetObject="{Binding Source={StaticResource LibVM}}"/>
                         </Core:EventTriggerBehavior>
