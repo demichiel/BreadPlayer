@@ -21,18 +21,15 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 
-namespace BreadPlayer.Core
+namespace BreadPlayer.ViewModels.Common
 {
+    //TODO:
+    //Remove all platform-specific code
+    //Remove all UI related code
     public class SharedLogic
     {
         public SharedLogic()
-        {
-            InitializeCore.Dispatcher = new Dispatcher.BreadDispatcher(Dispatcher);
-            InitializeCore.NotificationManager = NotificationManager;
-            InitializeCore.EqualizerSettingsHelper = new RoamingSettingsHelper();
-            InitializeCore.IsMobile = Windows.Foundation.Metadata.ApiInformation.IsApiContractPresent("Windows.Phone.PhoneContract", 1);
-
-            InitializeCore.IsMobile = Window.Current?.Bounds.Width <= 600;
+        {            
         }
         public static string DatabasePath { get => Path.Combine(ApplicationData.Current.LocalFolder.Path, "BreadPlayerDB"); }
         public System.Collections.ObjectModel.ObservableCollection<SimpleNavMenuItem> PlaylistsItems => GenericService<System.Collections.ObjectModel.ObservableCollection<SimpleNavMenuItem>>.Instance.GenericClass;
@@ -63,31 +60,7 @@ namespace BreadPlayer.Core
                 if (lastfmScrobbler == null)
                     lastfmScrobbler = value;
             }
-        }
-        public static Windows.UI.Xaml.Thickness DynamicMargin
-        {
-            get
-            {
-                if (CoreWindow.GetForCurrentThread().Bounds.Width < 600)
-                {
-                    return new Windows.UI.Xaml.Thickness(28, 0, 0, 0);
-                }
-                else
-                    return new Windows.UI.Xaml.Thickness(48, 0, 0, 0);
-            }
-        }
-        public static DataTemplate DynamicAlbumSelectedTemplate
-        {
-            get
-            {
-                if (CoreWindow.GetForCurrentThread().Bounds.Width < 600)
-                {
-                    return App.Current.Resources["MobileSelectedTemplate"] as DataTemplate;
-                }
-                else
-                    return App.Current.Resources["SelectedTemplate"] as DataTemplate;
-            }
-        }
+        }   
         #region ICommands
 
         #region Definitions
@@ -139,7 +112,7 @@ namespace BreadPlayer.Core
                 var createAlbumArt = AlbumArtFileExists(mediaFile);
                 await albumArt.CopyAsync(await StorageFolder.GetFolderFromPathAsync(ApplicationData.Current.LocalFolder.Path + "\\Albumarts\\"), createAlbumArt.FileName + Path.GetExtension(albumArt.Path), NameCollisionOption.ReplaceExisting);
                 mediaFile.AttachedPicture = ApplicationData.Current.LocalFolder.Path + "\\Albumarts\\" + createAlbumArt.FileName + Path.GetExtension(albumArt.Path);
-            }         
+            }
         }
         async void ShowProperties(object para)
         {
@@ -160,30 +133,13 @@ namespace BreadPlayer.Core
                 var storageFile = StorageFile.GetFileFromPathAsync(mp3File.Path);
                 var folderOptions = new FolderLauncherOptions();
                 folderOptions.ItemsToSelect.Add(await storageFile);
-                await Launcher.LaunchFolderAsync(folder, folderOptions);                
+                await Launcher.LaunchFolderAsync(folder, folderOptions);
             }
         }
-
-        RelayCommand _navigateCommand;
-        public ICommand NavigateToAlbumPageCommand
-        {
-            get
-            { if (_navigateCommand == null) { _navigateCommand = new RelayCommand(param => this.NavigateToAlbumPage(param)); } return _navigateCommand; }
-        }
-        void NavigateToAlbumPage(object para)
-        {
-            if (para is Album album)
-            {
-                SplitViewMenu.SplitViewMenu.UnSelectAll();
-
-                NavigationService.Instance.Frame.Navigate(typeof(PlaylistView), album);
-            }
-        }
-
         #endregion
 
         #endregion
-      
+
         public static string GetStringForNullOrEmptyProperty(string data, string setInstead)
         {
             return string.IsNullOrEmpty(data) ? setInstead : data;
@@ -206,7 +162,7 @@ namespace BreadPlayer.Core
                 catch { return (App.Current.Resources["PhoneAccentBrush"] as SolidColorBrush).Color; }
             }
         }
-        
+
         private static (bool NotExists, string FileName) AlbumArtFileExists(Mediafile file)
         {
             var albumartFolder = ApplicationData.Current.LocalFolder;
@@ -261,11 +217,11 @@ namespace BreadPlayer.Core
                         //            return true;
                         //        }
                         //    }
-                          //  break;
+                        //  break;
                         default:
                             break;
                     }
-                   // GC.Collect();
+                    // GC.Collect();
                 }
             }
             catch (Exception ex)
@@ -312,12 +268,12 @@ namespace BreadPlayer.Core
         {
             var mediafile = new Mediafile();
             try
-            {               
+            {
                 if (cache == true)
                 {
                     Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.Add(file);
                 }
-               
+
                 mediafile.Path = file.Path;
                 mediafile.OrginalFilename = file.DisplayName;
                 var properties = await file.Properties.GetMusicPropertiesAsync(); //(await file.Properties.RetrievePropertiesAsync(new List<string>() { "System.Music.AlbumTitle", "System.Music.Artist", "System.Music.Genre" }));//.GetMusicPropertiesAsync();

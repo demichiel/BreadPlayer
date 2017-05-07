@@ -31,8 +31,7 @@ using System.Reflection;
 namespace BreadPlayer.ViewModels
 {
     //TODO:
-    //Take out platform specific code and implement generic classes and methods instead.
-    //FilePickers will be a problem. Find a way to make it crossplatform
+    //Comment the code...where possible :D
     public class ShellViewModel : ViewModelBase
     {
         #region Fields
