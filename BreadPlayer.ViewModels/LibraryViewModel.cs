@@ -489,12 +489,6 @@ namespace BreadPlayer.ViewModels
         
         async void Init(object para)
         {
-            //NavigationService.Instance.Frame.Navigated += Frame_Navigated;
-            //if (ViewSource == null)
-            //    ViewSource = (para as Grid).Resources["Source"] as CollectionViewSource;
-
-            await RefreshSourceAsync().ConfigureAwait(false);
-
             if (source == null && Sort != null && Sort != "Unsorted")
             {
                 await LoadCollectionAsync(GetSortFunction(Sort), true).ConfigureAwait(false);

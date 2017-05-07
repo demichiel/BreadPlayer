@@ -39,7 +39,7 @@ namespace BreadPlayer.Core
         public string DatabasePath { get => Path.Combine(ApplicationData.Current.LocalFolder.Path, "BreadPlayerDB"); }
         public static System.Collections.ObjectModel.ObservableCollection<SimpleNavMenuItem> PlaylistsItems => GenericService<System.Collections.ObjectModel.ObservableCollection<SimpleNavMenuItem>>.Instance.GenericClass;
         public ThreadSafeObservableCollection<ContextMenuCommand> OptionItems => GenericService<ThreadSafeObservableCollection<ContextMenuCommand>>.Instance.GenericClass;// { get { return items; } set { Set(ref items, value); } }
-        public static BreadNotificationManager NotificationManager => GenericService<BreadNotificationManager>.Instance.GenericClass;// { get { return items; } set { Set(ref items, value); } }
+        public static BreadNotificationManager NotificationManager => CrossPlatformHelper.NotificationManager as BreadNotificationManager; // { get { return items; } set { Set(ref items, value); } }
         static CoreBreadPlayer player;
         public CoreBreadPlayer Player
         {
