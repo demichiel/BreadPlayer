@@ -1,5 +1,6 @@
 ﻿using BreadPlayer.Database;
 using BreadPlayer.Extensions;
+using BreadPlayer.Models.Common;
 using BreadPlayer.Web.BaiduLyricsAPI;
 using BreadPlayer.Web.Lastfm;
 using IF.Lastfm.Core.Api;
@@ -28,7 +29,8 @@ namespace BreadPlayer.ViewModels
         bool albumFetchFailed;
         public bool AlbumFetchFailed { get => albumFetchFailed; set => Set(ref albumFetchFailed, value); }
         #endregion
-        LibraryService service = new LibraryService(new KeyValueStoreDatabaseService(Core.SharedLogic.DatabasePath, "Tracks", "TracksText"));
+
+        LibraryService service = new LibraryService(new KeyValueStoreDatabaseService(Init.SharedLogic.DatabasePath, "Tracks", "TracksText"));
         public string CorrectArtist { get; set; }
         public string CorrectAlbum { get; set; }
         string artistBio;
@@ -64,9 +66,9 @@ namespace BreadPlayer.ViewModels
 
             //the work around to knowing when the new song has started.
             //the event is needed to update the bio etc.
-            Core.SharedLogic.Player.MediaChanging += (sender, e) =>
+            Init.SharedLogic.Player.MediaChanging += (sender, e) =>
             {
-                Core.SharedLogic.Player.MediaStateChanged += Player_MediaStateChanged;
+                Init.SharedLogic.Player.MediaStateChanged += Player_MediaStateChanged;
             };
         }
         private async void Retry(object para)
@@ -76,24 +78,24 @@ namespace BreadPlayer.ViewModels
                 if (string.IsNullOrEmpty(CorrectArtist))
                     return;
                 await GetArtistInfo(CorrectArtist, ArtistInfoToken);
-                Core.SharedLogic.Player.CurrentlyPlayingFile.LeadArtist = CorrectArtist;
+                Init.SharedLogic.Player.CurrentlyPlayingFile.LeadArtist = CorrectArtist;
             }
             else if(para.ToString() == "Album")
             {
                 if (string.IsNullOrEmpty(CorrectAlbum) || string.IsNullOrEmpty(CorrectArtist))
                     return;
                 await GetAlbumInfo(CorrectArtist, CorrectAlbum, AlbumInfoToken);
-                Core.SharedLogic.Player.CurrentlyPlayingFile.LeadArtist = CorrectArtist;
-                Core.SharedLogic.Player.CurrentlyPlayingFile.Album = CorrectAlbum;
+                Init.SharedLogic.Player.CurrentlyPlayingFile.LeadArtist = CorrectArtist;
+                Init.SharedLogic.Player.CurrentlyPlayingFile.Album = CorrectAlbum;
             }
-            await service.UpdateMediafile(Core.SharedLogic.Player.CurrentlyPlayingFile);
+            await service.UpdateMediafile(Init.SharedLogic.Player.CurrentlyPlayingFile);
         }
         private async void Player_MediaStateChanged(object sender, Events.MediaStateChangedEventArgs e)
         {
-            if (e.NewState == Core.PlayerState.Playing)
+            if (e.NewState == PlayerState.Playing)
             {
-                Core.SharedLogic.Player.MediaStateChanged -= Player_MediaStateChanged;
-                await GetInfo(Core.SharedLogic.Player.CurrentlyPlayingFile.LeadArtist, Core.SharedLogic.Player.CurrentlyPlayingFile.Album);
+                Init.SharedLogic.Player.MediaStateChanged -= Player_MediaStateChanged;
+                await GetInfo(Init.SharedLogic.Player.CurrentlyPlayingFile.LeadArtist, Init.SharedLogic.Player.CurrentlyPlayingFile.Album);
             }
         }
 

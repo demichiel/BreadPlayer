@@ -1,6 +1,9 @@
 ﻿using BreadPlayer.Common;
 using BreadPlayer.Core;
 using BreadPlayer.Extensions;
+using BreadPlayer.Helpers;
+using BreadPlayer.Helpers.Interfaces;
+using BreadPlayer.ViewModels;
 using System;
 using Windows.Storage;
 using Windows.UI;
@@ -10,7 +13,7 @@ using Windows.UI.Xaml.Media;
 
 namespace BreadPlayer.Themes
 {
-    public class ThemeManager
+    public class ThemeManager : IThemeManager
     {
         private static readonly string[] brushKeys = new[]
         {
@@ -38,7 +41,7 @@ namespace BreadPlayer.Themes
 
         };
 
-        public static async void SetThemeColor(string albumartPath)
+        public new static async void SetThemeColor(string albumartPath)
         {
             await SharedLogic.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
             {
@@ -54,16 +57,16 @@ namespace BreadPlayer.Themes
                         Color color;
                         if (!string.IsNullOrEmpty(albumartPath) && albumartPath != "default")
                             color = await SharedLogic.GetDominantColor(await StorageFile.GetFileFromPathAsync(albumartPath));
-                        else if (albumartPath == "default" && SharedLogic.Player.CurrentlyPlayingFile != null)
-                            color = await SharedLogic.GetDominantColor(await StorageFile.GetFileFromPathAsync(SharedLogic.Player.CurrentlyPlayingFile.AttachedPicture));
+                        else if (albumartPath == "default" && Init.SharedLogic.Player.CurrentlyPlayingFile != null)
+                            color = await SharedLogic.GetDominantColor(await StorageFile.GetFileFromPathAsync(Init.SharedLogic.Player.CurrentlyPlayingFile.AttachedPicture));
                         else
                             color = GetAccentColor();
                         ChangeColor(color);
                     }
                     catch (Exception ex)
                     {
-                        BLogger.Logger.Error("Failed to update accent.", ex);
-                        await Core.SharedLogic.NotificationManager.ShowMessageAsync(ex.Message);
+                        CrossPlatformHelper.Log.E("Failed to update accent.", ex);
+                        await CrossPlatformHelper.NotificationManager.ShowMessageAsync(ex.Message);
                     }
                     //ThemeChanged?.Invoke(null, new Events.ThemeChangedEventArgs(oldColor, color));
                 }

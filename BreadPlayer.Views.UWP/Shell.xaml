@@ -314,7 +314,11 @@
                                 </StackPanel>
                             </ToolTipService.ToolTip>
                         </AppBarButton>
-                        <AppBarButton BorderBrush="WhiteSmoke" Icon="{Binding PlayPauseIcon, Mode=TwoWay}" VerticalAlignment="Center" IsCompact="True" Command="{Binding PlayPauseCommand}" Style="{StaticResource CustomAppBarButtonStyle}" Width="40" Height="40" Margin="5,0,0,0"/>
+                        <AppBarButton BorderBrush="WhiteSmoke" VerticalAlignment="Center" IsCompact="True" Command="{Binding PlayPauseCommand}" Style="{StaticResource CustomAppBarButtonStyle}" Width="40" Height="40" Margin="5,0,0,0">
+                            <AppBarButton.Icon>
+                                <FontIcon Glyph="{Binding PlayPauseIcon, Mode=TwoWay}"/>
+                            </AppBarButton.Icon>
+                        </AppBarButton>
                         <AppBarButton BorderBrush="WhiteSmoke" Icon="Next" VerticalAlignment="Center"   IsCompact="True" Style="{StaticResource CustomAppBarButtonStyle}" Command="{Binding PlayNextCommand}" Background="{ThemeResource AppBarButtonBackgroundDisabled}" Width="40" Height="40" Margin="5,0,0,0">
                             <ToolTipService.ToolTip>
                                 <StackPanel Orientation="Horizontal" Width="250" DataContext="{Binding UpcomingSong}" Height="Auto">

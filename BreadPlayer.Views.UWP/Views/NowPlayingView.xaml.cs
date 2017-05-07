@@ -53,12 +53,12 @@ namespace BreadPlayer
             positionSlider.InitEvents(() => { positionSlider.UpdatePosition(null, ShellVM); }, () => { ShellVM.DontUpdatePosition = true; });
             Window.Current.SizeChanged += (evnt, args) =>
             {
-                if (InitializeCore.IsMobile && NowPlayingGrid.Children.Contains(NowPlayingList))
+                if (CrossPlatformHelper.IsMobile && NowPlayingGrid.Children.Contains(NowPlayingList))
                 {
                     NowPlayingGrid.Children.Remove(NowPlayingList);
                     RootGrid.Children.Insert(RootGrid.Children.Count - 2, NowPlayingList);
                 }
-                else if (!InitializeCore.IsMobile && !NowPlayingGrid.Children.Contains(NowPlayingList))
+                else if (!CrossPlatformHelper.IsMobile && !NowPlayingGrid.Children.Contains(NowPlayingList))
                 {
                     RootGrid.Children.Remove(NowPlayingList);
                     NowPlayingGrid.Children.Add(NowPlayingList);
@@ -68,7 +68,7 @@ namespace BreadPlayer
 
         private void ShowNowPlayingListBtn_Click(object sender, RoutedEventArgs e)
         {
-            if (InitializeCore.IsMobile && NowPlayingGrid.Children.Contains(NowPlayingList))
+            if (CrossPlatformHelper.IsMobile && NowPlayingGrid.Children.Contains(NowPlayingList))
             {
                 NowPlayingGrid.Children.Remove(NowPlayingList);
                 RootGrid.Children.Insert(RootGrid.Children.Count - 2, NowPlayingList);

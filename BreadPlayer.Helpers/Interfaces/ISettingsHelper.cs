@@ -4,9 +4,12 @@ using System.Text;
 
 namespace BreadPlayer.Helpers.Interfaces
 {
-    public interface ISettingsHelper : IEqualizerSettingsHelper
+    public abstract class SettingsHelper : IEqualizerSettingsHelper
     {
-        void SaveSetting(string key, object value);
-        T GetSetting<T>(string key, object def);
+        public virtual void SaveSetting(string key, object value) { }
+        public virtual T GetSetting<T>(string key, object def) { return default(T); }
+
+        public abstract (float[] EqConfig, bool IsEnabled, float PreAMP) LoadEqualizerSettings();
+        public abstract void SaveEqualizerSettings(float[] eqConfig, bool isEnabled, float PreAmp);
     }
 }

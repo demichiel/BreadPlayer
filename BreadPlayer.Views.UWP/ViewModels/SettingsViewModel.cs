@@ -38,6 +38,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 using Windows.System.Display;
+using BreadPlayer.Helpers;
 
 namespace BreadPlayer.ViewModels
 {
@@ -176,13 +177,13 @@ namespace BreadPlayer.ViewModels
         #region Ctor  
         public SettingsViewModel()
         {
-            LibraryService = new LibraryService(new KeyValueStoreDatabaseService(Core.SharedLogic.DatabasePath, "Tracks", "TracksText"));
+            LibraryService = new LibraryService(new KeyValueStoreDatabaseService(Init.SharedLogic.DatabasePath, "Tracks", "TracksText"));
             this.PropertyChanged += SettingsViewModel_PropertyChanged;
             changeAccentByAlbumart = RoamingSettingsHelper.GetSetting<bool>("ChangeAccentByAlbumArt", true);
             timeOpened = DateTimeOffset.Now.ToString("yyyy-MM-dd HH:mm:ss");
             uiTextType = RoamingSettingsHelper.GetSetting<string>("UITextType", "Normal");
             _isThemeDark = RoamingSettingsHelper.GetSetting<string>("SelectedTheme", "Light") == "Light" ? true : false;
-            enableBlur = RoamingSettingsHelper.GetSetting<bool>("EnableBlur", !InitializeCore.IsMobile);
+            enableBlur = RoamingSettingsHelper.GetSetting<bool>("EnableBlur", !CrossPlatformHelper.IsMobile);
             replaceLockscreenWithAlbumArt = RoamingSettingsHelper.GetSetting<bool>("replaceLockscreenWithAlbumArt", false);
             Messengers.Messenger.Instance.Register(Messengers.MessageTypes.MSG_LIBRARY_LOADED, new Action<Message>(HandleLibraryLoadedMessage));
         }
@@ -238,7 +239,7 @@ namespace BreadPlayer.ViewModels
             }
             catch (Exception ex)
             {
-                BLogger.Logger.Error("Error occured while resetting the player.", ex);
+                CrossPlatformHelper.Log.E("Error occured while resetting the player.", ex);
             }
         }
         private async void ImportPlaylists()
@@ -286,7 +287,7 @@ namespace BreadPlayer.ViewModels
             }
             catch(UnauthorizedAccessException)
             {
-                await NotificationManager.ShowMessageAsync("You are not authorized to access this folder. Please choose another folder or try again.");
+                await CrossPlatformHelper.NotificationManager.ShowMessageAsync("You are not authorized to access this folder. Please choose another folder or try again.");
             }
         }
 
@@ -372,14 +373,14 @@ namespace BreadPlayer.ViewModels
                     if (TracksCollection.Elements.Any(t => t.Path == file.Path))
                     {
                         index = TracksCollection.Elements.IndexOf(TracksCollection.Elements.First(t => t.Path == file.Path));
-                        SharedLogic.RemoveMediafile(TracksCollection.Elements.First(t => t.Path == file.Path));
+                        await SharedLogic.RemoveMediafile(TracksCollection.Elements.First(t => t.Path == file.Path));
                     }
                     //this methods notifies the Player that one song is loaded. We use both 'count' and 'i' variable here to report current progress.
-                    await SharedLogic.NotificationManager.ShowMessageAsync(" Song(s) Loaded");
+                    await CrossPlatformHelper.NotificationManager.ShowMessageAsync(" Song(s) Loaded");
                     await Task.Run(async () =>
                     {
                         //here we load into 'mp3file' variable our processed Song. This is a long process, loading all the properties and the album art.
-                        mp3file = await SharedLogic.CreateMediafile(file, false); //the core of the whole method.
+                        mp3file = await Init.SharedLogic.CreateMediafile(file.Path, false); //the core of the whole method.
                         await SaveSingleFileAlbumArtAsync(mp3file, file).ConfigureAwait(false);
                     });
                     SharedLogic.AddMediafile(mp3file, index);
@@ -413,8 +414,8 @@ namespace BreadPlayer.ViewModels
             }
             catch (Exception ex)
             {
-                BLogger.Logger.Error("Auto Loading of library failed.", ex);
-                await NotificationManager.ShowMessageAsync(ex.Message);
+                CrossPlatformHelper.Log.E("Auto Loading of library failed.", ex);
+                await CrossPlatformHelper.NotificationManager.ShowMessageAsync(ex.Message);
             }
         }
         /// <summary>
@@ -437,8 +438,8 @@ namespace BreadPlayer.ViewModels
                 if (count == 0)
                 {
                     string error = "No songs found!";
-                    BLogger.Logger.Error("No songs were found!");
-                    await NotificationManager.ShowMessageAsync(error);
+                    CrossPlatformHelper.Log.E("No songs were found!");
+                    await CrossPlatformHelper.NotificationManager.ShowMessageAsync(error);
                     return;
                 }
 
@@ -456,20 +457,20 @@ namespace BreadPlayer.ViewModels
                                 Mediafile mp3file = null;
                                 i++;
                                 Messenger.Instance.NotifyColleagues(MessageTypes.MSG_UPDATE_SONG_COUNT, i);
-                                mp3file = await SharedLogic.CreateMediafile(file, false).ConfigureAwait(false); //the core of the whole method.
+                                mp3file = await Init.SharedLogic.CreateMediafile(file.Path, false).ConfigureAwait(false); //the core of the whole method.
                                 mp3file.FolderPath = Path.GetDirectoryName(file.Path);
                                 await SaveSingleFileAlbumArtAsync(mp3file, file).ConfigureAwait(false);
 
-                                await NotificationManager.ShowMessageAsync(i.ToString() + "\\" + count.ToString() + " Song(s) Loaded", 0);
+                                await CrossPlatformHelper.NotificationManager.ShowMessageAsync(i.ToString() + "\\" + count.ToString() + " Song(s) Loaded", 0);
 
                                 tempList.Add(mp3file);
                                 mp3file = null;
                             }
                             catch (Exception ex)
                             {
-                                // BLogger.Logger.Error("Loading of a song in folder failed.", ex);
+                                // CrossPlatformHelper.Log.E("Loading of a song in folder failed.", ex);
                                 //we catch and report any exception without distrubing the 'foreach flow'.
-                                await NotificationManager.ShowMessageAsync(ex.Message + " || Occured on: " + file.Path);
+                                await CrossPlatformHelper.NotificationManager.ShowMessageAsync(ex.Message + " || Occured on: " + file.Path);
                                 failedCount++;
                             }
                         }
@@ -478,9 +479,9 @@ namespace BreadPlayer.ViewModels
                     catch (Exception ex)
                     {
                         string message1 = ex.Message + "||" + ex.InnerException;
-                        await NotificationManager.ShowMessageAsync(message1);
+                        await CrossPlatformHelper.NotificationManager.ShowMessageAsync(message1);
                     }
-                    await NotificationManager.ShowMessageAsync("Saving songs into database. Please wait...");
+                    await CrossPlatformHelper.NotificationManager.ShowMessageAsync("Saving songs into database. Please wait...");
 
                     await LibraryService.AddMediafiles(tempList);
                     await TracksCollection.AddRange(tempList).ConfigureAwait(false);
@@ -494,8 +495,8 @@ namespace BreadPlayer.ViewModels
                     isLibraryLoading = false;
                     string message = string.Format("Songs successfully imported! Total Songs: {0}; Failed: {1}; Loaded: {2}", count, failedCount, i);
 
-                    BLogger.Logger.Info(message);
-                    await NotificationManager.ShowMessageAsync(message);
+                    CrossPlatformHelper.Log.I(message);
+                    await CrossPlatformHelper.NotificationManager.ShowMessageAsync(message);
                     tempList.Clear();
                 });
             }
@@ -561,23 +562,19 @@ namespace BreadPlayer.ViewModels
             {
                 try
                 {
-                    if (file == null)
-                        file = await StorageFile.GetFileFromPathAsync(mp3file.Path);
-
                     var albumartFolder = ApplicationData.Current.LocalFolder;
                     var albumartLocation = albumartFolder.Path + @"\AlbumArts\" + (mp3file.Album + mp3file.LeadArtist).ToLower().ToSha1() + ".jpg";
 
                     if (!SharedLogic.VerifyFileExists(albumartLocation, 300))
                     {
-                        bool albumSaved = await SharedLogic.SaveImagesAsync(file, mp3file);                       
+                        bool albumSaved = await Init.SharedLogic.SaveAlbumArtAsync(mp3file);
                         mp3file.AttachedPicture = albumSaved ? albumartLocation : null;
                     }
-                    file = null;
                 }
                 catch (Exception ex)
                 {
-                    BLogger.Logger.Info("Failed to save albumart.", ex);
-                    await SharedLogic.NotificationManager.ShowMessageAsync("Failed to save album art of " + mp3file.OrginalFilename);
+                    CrossPlatformHelper.Log.I("Failed to save albumart.", ex);
+                    await CrossPlatformHelper.NotificationManager.ShowMessageAsync("Failed to save album art of " + mp3file.OrginalFilename);
                 }
             }
         }
@@ -614,7 +611,7 @@ namespace BreadPlayer.ViewModels
                     //FOR ADDITION (we check all the files to see if we already have the file or not)
                     if (TracksCollection.Elements.ToArray().All(t => t.Path != file.Path))
                     {
-                        var mediafile = await SharedLogic.CreateMediafile(file, false);
+                        var mediafile = await Init.SharedLogic.CreateMediafile(file.Path, false);
                         SharedLogic.AddMediafile(mediafile);
                         await SaveSingleFileAlbumArtAsync(mediafile);
                     }
@@ -634,8 +631,8 @@ namespace BreadPlayer.ViewModels
             }
             catch (Exception ex)
             {
-                BLogger.Logger.Error("Some error occured while renaming, deleting or editting the modified files.", ex);
-                await SharedLogic.NotificationManager.ShowMessageAsync(ex.Message);
+                CrossPlatformHelper.Log.E("Some error occured while renaming, deleting or editting the modified files.", ex);
+                await CrossPlatformHelper.NotificationManager.ShowMessageAsync(ex.Message);
             }
         }
 

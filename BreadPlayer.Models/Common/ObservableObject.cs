@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BreadPlayer.Models.Init;
+using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
@@ -41,9 +42,14 @@ public class ObservableObject : INotifyPropertyChanged
 
     /// <summary>Raises the property changed event. </summary>
     /// <param name="args">The arguments. </param>
-    protected virtual void RaisePropertyChanged(PropertyChangedEventArgs args)
+    protected async virtual void RaisePropertyChanged(PropertyChangedEventArgs args)
     {
-        PropertyChanged?.Invoke(this, args);
+        if (Initialize.Dispatcher != null)
+        {
+            await Initialize.Dispatcher?.RunAsync(() => { PropertyChanged?.Invoke(this, args); });
+        }
+        else
+            PropertyChanged?.Invoke(this, args);
     }
 
     /// <summary>Raises the property changed event for all properties (string.Empty). </summary>

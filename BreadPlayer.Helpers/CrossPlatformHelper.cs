@@ -9,12 +9,11 @@ namespace BreadPlayer.Helpers
     {
         public static bool IsMobile { get; set; }
         public static INotificationManager NotificationManager { get; set; }
-        public static IEqualizerSettingsHelper EqualizerSettingsHelper { get; set; }
         public static IDispatcher Dispatcher { get; set; }
         public static Log Log { get; set; }
-        public static ISettingsHelper SettingsHelper { get; set; }
+        public static SettingsHelper SettingsHelper { get; set; }
         public static IWindowHelper WindowHelper { get; set; }
         public static IFilePickerHelper FilePickerHelper { get; set; }
-        public static IThemeManager ThemeManager { get; set; }
+        public static IThemeManager ThemeManager { get; set; }       
     }
 }

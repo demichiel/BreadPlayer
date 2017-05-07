@@ -2,6 +2,7 @@
 using BreadPlayer.Web.Lastfm;
 using BreadPlayer.Common;
 using IF.Lastfm.Core.Objects;
+using BreadPlayer.Helpers;
 
 namespace BreadPlayer.ViewModels
 {
@@ -43,7 +44,7 @@ namespace BreadPlayer.ViewModels
             {
                 if ((bool)para)
                 {
-                    await NotificationManager.ShowMessageAsync("You need to enter username and password first!");
+                    await CrossPlatformHelper.NotificationManager.ShowMessageAsync("You need to enter username and password first!");
                 }
                 return;
             }
@@ -58,16 +59,16 @@ namespace BreadPlayer.ViewModels
             {
                 await lastfm.Login(LastfmUsername, LastfmPassword);
             }
-            Core.SharedLogic.LastfmScrobbler = lastfm;
+            Init.SharedLogic.LastfmScrobbler = lastfm;
 
             if (lastfm.LastfmClient.Auth.Authenticated)
             {
                 LoginStatus = "(Logged In)";
                 SaveUserSession(lastfm.LastfmClient.Auth.UserSession);
-                await NotificationManager.ShowMessageAsync("Successfully logged in!");
+                await CrossPlatformHelper.NotificationManager.ShowMessageAsync("Successfully logged in!");
             }
             else
-                await NotificationManager.ShowMessageAsync("Bad username/password. Please reenter.");
+                await CrossPlatformHelper.NotificationManager.ShowMessageAsync("Bad username/password. Please reenter.");
         }
         #endregion
         private LastUserSession GetUserSessionFromSettings()

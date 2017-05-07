@@ -31,6 +31,7 @@ namespace BreadPlayer.Extensions
         where TElement : IComparable<TElement>
     {
         private readonly Func<TElement, TKey> readKey;
+        private static Func<TElement, TKey> readKey2;
 
         /// <summary>
         /// This is used as an optimisation for when items are likely to be added in key order and there is a good probability
@@ -42,10 +43,12 @@ namespace BreadPlayer.Extensions
         public GroupedObservableCollection(Func<TElement, TKey> readKey)
         {
             this.readKey = readKey;
+            readKey2 = readKey;
         }
         public GroupedObservableCollection(Func<TElement, TKey> readKey, IEnumerable<TElement> items)
             : this(readKey)
-        {            
+        {
+            readKey2 = readKey;
             Elements = new SortedObservableCollection<TElement, string>(t => readKey.Invoke(t).ToString());
             Elements.AddRange(items);
             foreach (var item in items)
@@ -164,7 +167,7 @@ namespace BreadPlayer.Extensions
             Elements.Remove(item);
         }
         public IEnumerable<TKey> Keys => this.Select(i => i.Key);
-        public SortedObservableCollection<TElement, string> Elements { get; set; }
+        public SortedObservableCollection<TElement, string> Elements { get; set; } = new SortedObservableCollection<TElement, string>(t => readKey2.Invoke(t).ToString());
         public GroupedObservableCollection<TKey, TElement> ReplaceWith(GroupedObservableCollection<TKey, TElement> replacementCollection, IEqualityComparer<TElement> itemComparer)
         {
             // First make sure that the top level group containers match

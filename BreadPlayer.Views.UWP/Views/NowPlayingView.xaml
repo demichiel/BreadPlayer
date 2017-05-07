@@ -92,7 +92,7 @@
         <StackPanel x:Name="playcontrolsPanel" Grid.Row="2" Grid.ColumnSpan="2" VerticalAlignment="Top" DataContext="{StaticResource ShellVM}" Orientation="Horizontal" HorizontalAlignment="Center">
             <Button Content="&#xE892;" FontFamily="Segoe MDL2 Assets" Foreground="{StaticResource ThemeForeground}" Background="Transparent" FontSize="20" Command="{Binding PlayPreviousCommand}" Style="{StaticResource HyperlinkBtn}" VerticalAlignment="Stretch"/>
             <Button x:Name="playBtn" Margin="20,0,20,0" Background="Transparent" Foreground="{StaticResource ThemeForeground}" Height="60" Command="{Binding PlayPauseCommand}" VerticalAlignment="Stretch"  Style="{StaticResource HyperlinkBtn}">
-                <TextBlock x:Name="playIcon" FontFamily="Segoe MDL2 Assets" Text="{Binding PlayPauseIcon, Mode=TwoWay,Converter={StaticResource SymbolToChar}}" FontSize="34"/>
+                <TextBlock x:Name="playIcon" FontFamily="Segoe MDL2 Assets" Text="{Binding PlayPauseIcon, Mode=TwoWay}" FontSize="34"/>
             </Button>
             <Button  Content="&#xE893;" FontFamily="Segoe MDL2 Assets" Background="Transparent" FontSize="20" Foreground="{StaticResource ThemeForeground}" Command="{Binding PlayNextCommand}" Style="{StaticResource HyperlinkBtn}" VerticalAlignment="Stretch"/>
         </StackPanel>

@@ -97,7 +97,7 @@ namespace BreadPlayer.Extensions
         }
     }
 
-    public class ContextMenuCommand : ViewModelBase
+    public class ContextMenuCommand : ObservableObject
     {
         public ContextMenuCommand(ICommand command, string text, object cmdPara = null)
         {
@@ -151,7 +151,7 @@ namespace BreadPlayer.Extensions
             {
                 await SharedLogic.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                 {
-                    core.OptionItems.CollectionChanged += OptionItems_CollectionChanged;
+                    SharedLogic.OptionItems.CollectionChanged += OptionItems_CollectionChanged;
                     menuFlyout.Items.Clear();
                     MenuFlyoutSubItem addTo = new MenuFlyoutSubItem() { Text = "Add to" };
                     MenuFlyoutItem properties = new MenuFlyoutItem() { Text = "Properties", Command = core.ShowPropertiesCommand, CommandParameter = null };
@@ -162,7 +162,7 @@ namespace BreadPlayer.Extensions
                     menuFlyout.Items.Add(changeAlbumArt);
                     menuFlyout.Items.Add(openLoc);
                     menuFlyout.Items.Add(properties);
-                    foreach (var menuItem in core.OptionItems)
+                    foreach (var menuItem in SharedLogic.OptionItems)
                     {
                         var item = new MenuFlyoutItem()
                         {
@@ -177,8 +177,8 @@ namespace BreadPlayer.Extensions
                         }
                         addTo.Items.Add(item);
                     }
-                });               
-                SharedLogic.Player.PropertyChanged += Player_PropertyChanged;
+                });
+                ViewModels.Init.SharedLogic.Player.PropertyChanged += Player_PropertyChanged;
             }
 
         }

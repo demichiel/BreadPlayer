@@ -38,7 +38,6 @@ namespace BreadPlayer.ViewModels
     {
         #region Fields
         private char _playPauseIcon = '\uE768';
-        private char _repeatIcon = ' ';
         private Mediafile _songToStopAfter;
         DispatcherTimer timer;
         UndoRedoStack<Mediafile> history = new UndoRedoStack<Mediafile>();

@@ -159,11 +159,10 @@
     <Compile Include="Events\ThemeChangedEventArgs.cs" />
     <Compile Include="Extensions\SolidColorBrushExtensions.cs" />
     <Compile Include="Extensions\DependencyObjectExtensions.cs" />
-    <Compile Include="Extensions\SortedObservableCollection.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Extensions\TextBlockExtensions.cs" />
-    <Compile Include="Extensions\ThreadSafeObservableCollection.cs" />
     <Compile Include="HamburgerMenu\Shortcut.cs" />
+    <Compile Include="Helpers\FilePickerHelper.cs" />
     <Compile Include="Helpers\LockscreenHelper.cs" />
     <Compile Include="Dialogs\InputDialog.xaml.cs">
       <DependentUpon>InputDialog.xaml</DependentUpon>
@@ -172,11 +171,10 @@
       <DependentUpon>TagDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Extensions\BindableFlyout.cs" />
-    <Compile Include="Extensions\GroupedObservableCollection.cs" />
-    <Compile Include="Extensions\ObservableCollectionExtensions.cs" />
     <Compile Include="Extensions\VisualTreeHelperExtensions.cs" />
     <Compile Include="Common\UndoRedoStack.cs" />
     <Compile Include="Helpers\SliderHelper.cs" />
+    <Compile Include="Helpers\WindowHelper.cs" />
     <Compile Include="PlaylistBus\IPlaylist.cs" />
     <Compile Include="PlaylistBus\M3U.cs" />
     <Compile Include="PlaylistBus\PLS.cs" />
@@ -209,7 +207,6 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
-    <Compile Include="ViewModels\ShellViewModel.cs" />
     <Compile Include="HamburgerMenu\INavigationMenuItem.cs" />
     <Compile Include="HamburgerMenu\NavMenuListView.cs" />
     <Compile Include="HamburgerMenu\SimpleNavMenuItem.cs" />
@@ -400,9 +397,29 @@
       <Project>{e63c3de4-ab33-4611-b193-9739fccb1661}</Project>
       <Name>BreadPlayer.Database</Name>
     </ProjectReference>
+    <ProjectReference Include="..\BreadPlayer.Extensions\BreadPlayer.Extensions.csproj">
+      <Project>{434d5f4b-b682-4a98-890f-b4c495914489}</Project>
+      <Name>BreadPlayer.Extensions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\BreadPlayer.Framework\BreadPlayer.Framework.csproj">
       <Project>{f22742c9-7088-4325-9f87-0a1aa34dda74}</Project>
       <Name>BreadPlayer.Framework</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BreadPlayer.Helpers\BreadPlayer.Helpers.csproj">
+      <Project>{1bc3c477-bb82-4856-bd8a-f0deec4b25a7}</Project>
+      <Name>BreadPlayer.Helpers</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BreadPlayer.Logger\BreadPlayer.Logger.csproj">
+      <Project>{dc8d9dd8-9b88-4901-9fce-69a83660b9c3}</Project>
+      <Name>BreadPlayer.Logger</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BreadPlayer.Models\BreadPlayer.Models.csproj">
+      <Project>{6862b0fd-3a14-467f-8617-7975f0aab3a1}</Project>
+      <Name>BreadPlayer.Models</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BreadPlayer.ViewModels\BreadPlayer.ViewModels.csproj">
+      <Project>{74f99b71-798d-44d5-8f72-3cb3158af2ff}</Project>
+      <Name>BreadPlayer.ViewModels</Name>
     </ProjectReference>
     <ProjectReference Include="..\BreadPlayer.Web\BreadPlayer.Web.csproj">
       <Project>{8baa2dc7-9675-480f-a9f5-8d8d6245689b}</Project>

@@ -10,11 +10,11 @@ namespace BreadPlayer.Helpers.Interfaces
         Task<Mediafile> CreateMediafile(string path, bool cache = false);
         Task<bool> AskPasswordForPlaylist(Playlist playlist);
         Task<bool> SaveAlbumArtAsync(Mediafile mediafile);
-        CoreBreadPlayer Player { get; set; }
+        CoreBreadPlayer Player { get; }
         Lastfm LastfmScrobbler { get; set; }
-        ICommand ShowPropertiesCommand { get; set; }
-        ICommand OpenSongLocationCommand { get; set; }
-        ICommand ChangeAlbumArtCommand { get; set; }
-        string DatabasePath { get; set; }
+        ICommand ShowPropertiesCommand { get; }
+        ICommand OpenSongLocationCommand { get; }
+        ICommand ChangeAlbumArtCommand { get; }
+        string DatabasePath { get; }
     }
 }

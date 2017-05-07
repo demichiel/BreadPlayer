@@ -32,6 +32,10 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using BreadPlayer.Helpers;
+using System.IO;
+using Windows.Storage;
+using Windows.UI.Core;
+using BreadPlayer.Core;
 
 namespace BreadPlayer
 {
@@ -40,6 +44,7 @@ namespace BreadPlayer
     /// </summary>
     sealed partial class App : Application
     {
+        private Log Logger { get; set; }
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
@@ -49,24 +54,34 @@ namespace BreadPlayer
             this.InitializeComponent();
             CoreApplication.EnablePrelaunch(true);
             InitializeTheme();
-            BLogger.InitLogger();
-            BLogger.Logger.Info("Logger initialized. Progressing in app constructor.");
+            Log.InitLogger(KnownFolders.MusicLibrary.CreateFolderAsync("BreadPlayerLogs", CreationCollisionOption.OpenIfExists).AsTask().Result.Path + "\\log.log");
+            Logger = new Log();
+            CrossPlatformHelper.NotificationManager = new BreadPlayer.NotificationManager.BreadNotificationManager();
+            CrossPlatformHelper.Log = Logger;
+            CrossPlatformHelper.SettingsHelper = new RoamingSettingsHelper();
+            CrossPlatformHelper.ThemeManager = new BreadPlayer.Themes.ThemeManager();
+            CrossPlatformHelper.FilePickerHelper = new FilePickerHelper();
+            CrossPlatformHelper.WindowHelper = new WindowHelper();
+
+            Init.SharedLogic = new SharedLogic();
+            Logger.I("Logger initialized. Progressing in app constructor.");
             this.Suspending += OnSuspending;
             this.EnteredBackground += App_EnteredBackground;
             this.LeavingBackground += App_LeavingBackground;
             this.UnhandledException += App_UnhandledException;
             TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
-            BLogger.Logger.Info("Events initialized. Progressing in app constructor.");
+            Logger.I("Events initialized. Progressing in app constructor.");
+
         }
 
         private void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
         {
-            BLogger.Logger.Error(string.Format("Task ({0}) terminating...", e.Exception.Source), e.Exception);
+            Logger.E(string.Format("Task ({0}) terminating...", e.Exception.Source), e.Exception);
         }
 
         private void App_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            BLogger.Logger.Fatal("Something caused the app to crash!", e.Exception);
+            Logger.F("Something caused the app to crash!", e.Exception);
         }
 
         private void InitializeTheme()
@@ -79,7 +94,7 @@ namespace BreadPlayer
         private void App_LeavingBackground(object sender, LeavingBackgroundEventArgs e)
         {
             var deferral = e.GetDeferral();
-            BLogger.Logger.Info("App left background and is now in foreground...");
+            Logger.I("App left background and is now in foreground...");
             deferral.Complete();
         }
 
@@ -88,7 +103,7 @@ namespace BreadPlayer
             var deferral = e.GetDeferral();
             CoreWindowLogic.SaveSettings();
             CoreWindowLogic.UpdateSmtc();
-            BLogger.Logger.Info("App has entered background...");
+            Logger.I("App has entered background...");
             deferral.Complete();
         }
         Stopwatch SessionWatch;
@@ -100,7 +115,7 @@ namespace BreadPlayer
         protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
             SessionWatch = Stopwatch.StartNew();
-            BLogger.Logger?.Info("App launched and session started...");
+            Logger.I("App launched and session started...");
 #if DEBUG
             if (System.Diagnostics.Debugger.IsAttached)
             {
@@ -118,7 +133,7 @@ namespace BreadPlayer
         /// <param name="e">Details about the navigation failure</param>
         void OnNavigationFailed(object sender, NavigationFailedEventArgs e)
         {
-            BLogger.Logger.Error("Navigation failed while navigating to: " + e.SourcePageType.FullName, e.Exception);
+            Logger.E("Navigation failed while navigating to: " + e.SourcePageType.FullName, e.Exception);
             //throw new Exception("Failed to load Page " + e.SourcePageType.FullName);
         }
 
@@ -134,7 +149,7 @@ namespace BreadPlayer
             var deferral = e.SuspendingOperation.GetDeferral();
             await LockscreenHelper.ResetLockscreenImage();
             SessionWatch?.Stop();
-            BLogger.Logger?.Info("App suspended and session terminated. Session length: " + SessionWatch.Elapsed.TotalMinutes);
+            Logger.I("App suspended and session terminated. Session length: " + SessionWatch.Elapsed.TotalMinutes);
             CoreWindowLogic.SaveSettings();
             await Task.Delay(500);
             deferral.Complete();
@@ -145,13 +160,13 @@ namespace BreadPlayer
             if (args.PreviousExecutionState == ApplicationExecutionState.Running)
             {
                 Messengers.Messenger.Instance.NotifyColleagues(Messengers.MessageTypes.MSG_EXECUTE_CMD, new List<object> { args.Files[0], 0.0, true, 50.0 });
-                BLogger.Logger.Info("File was loaded successfully while app was running...");
+                Logger.I("File was loaded successfully while app was running...");
                 // ShellVM.Play(args.Files[0]);
             }
             else
             {
                 LoadFrame(args, args.Files[0]);
-                BLogger.Logger.Info("Player opened successfully with file as argument...");
+                Logger.I("Player opened successfully with file as argument...");
             }
         }
 
@@ -159,7 +174,7 @@ namespace BreadPlayer
         {
             try
             {
-               // BLogger.Logger.Info("Loading frame started...");
+               // CrossPlatformHelper.Log.I("Loading frame started...");
                 Frame rootFrame = Window.Current.Content as Frame;
 
                 // Do not repeat app initialization when the Window already has content
@@ -167,7 +182,7 @@ namespace BreadPlayer
                 {
                     // Create a Frame to act as the navigation context
                     rootFrame = new Frame();
-                  //  BLogger.Logger.Info("New frame created.");
+                  //  CrossPlatformHelper.Log.I("New frame created.");
                     if (args.PreviousExecutionState == ApplicationExecutionState.Terminated)
                     {
                         //CoreWindowLogic.ShowMessage("HellO!!!!!", "we are here");
@@ -178,15 +193,16 @@ namespace BreadPlayer
                     rootFrame.NavigationFailed += OnNavigationFailed;
                     // Place the frame in the current Window
                     Window.Current.Content = rootFrame;
-
-                    BLogger.Logger.Info("Content set to Window successfully...");
+                    CrossPlatformHelper.Dispatcher = new BreadPlayer.Dispatcher.BreadDispatcher(CoreWindow.GetForCurrentThread().Dispatcher);
+                    Models.Init.Initialize.Dispatcher = CrossPlatformHelper.Dispatcher;
+                    Logger.I("Content set to Window successfully...");
                 }
                 if (rootFrame.Content == null)
                 {
                     // When the navigation stack isn't restored navigate to the first page,
                     // configuring the new page by passing required information as a navigation
                     // parameter
-                    BLogger.Logger.Info("Navigating to Shell...");
+                    Logger.I("Navigating to Shell...");
                     rootFrame.Navigate(typeof(Shell), arguments);
                 }
                 
@@ -194,9 +210,9 @@ namespace BreadPlayer
                  view.SetPreferredMinSize(new Size(360, 100));
                 if (Windows.Foundation.Metadata.ApiInformation.IsTypePresent("Windows.UI.ViewManagement.StatusBar"))
                 {
-                    BLogger.Logger.Info("Trying to maximize to full screen.");
+                    Logger.I("Trying to maximize to full screen.");
                     ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
-                    BLogger.Logger.Info("Maximized to full screen.");
+                    Logger.I("Maximized to full screen.");
                 }
                 if (args.Kind != ActivationKind.File)
                 {
@@ -210,7 +226,7 @@ namespace BreadPlayer
             }
             catch (Exception ex)
             {
-                BLogger.Logger?.Info("Exception occured in LoadFrame Method", ex);
+                Logger.I("Exception occured in LoadFrame Method", ex);
             }
         }
 

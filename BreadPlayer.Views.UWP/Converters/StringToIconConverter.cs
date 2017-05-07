@@ -8,17 +8,22 @@ namespace BreadPlayer.Converters
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {
-            string val = value.ToString();
             SymbolIcon symbol = null;
-            if (val == "No Repeat")
+            if (value != null)
             {
-                symbol = new SymbolIcon(Symbol.Sync);
-            }
-            else if (val == "Repeat Song")
-                symbol = new SymbolIcon(Symbol.RepeatOne);
-            else
-                symbol = new SymbolIcon(Symbol.RepeatAll);
+                string val = value.ToString();
 
+                if (val == "No Repeat")
+                {
+                    symbol = new SymbolIcon(Symbol.Sync);
+                }
+                else if (val == "Repeat Song")
+                    symbol = new SymbolIcon(Symbol.RepeatOne);
+                else
+                    symbol = new SymbolIcon(Symbol.RepeatAll);
+            }
+            else
+                symbol = new SymbolIcon(Symbol.Sync);
             if (parameter?.ToString() == "char")
                 return (char)(symbol.Symbol);
             else

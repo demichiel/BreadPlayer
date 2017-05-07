@@ -1,6 +1,8 @@
 ﻿using BreadPlayer.Database;
 using BreadPlayer.Dialogs;
 using BreadPlayer.Extensions;
+using BreadPlayer.Helpers;
+using BreadPlayer.Helpers.Interfaces;
 using BreadPlayer.Models;
 using BreadPlayer.NotificationManager;
 using BreadPlayer.Services;
@@ -23,23 +25,23 @@ using Windows.UI.Xaml.Media;
 
 namespace BreadPlayer.Core
 {
-    public class SharedLogic
+    public class SharedLogic : ISharedLogic
     {
         public SharedLogic()
         {
-            InitializeCore.Dispatcher = new Dispatcher.BreadDispatcher(Dispatcher);
-            InitializeCore.NotificationManager = NotificationManager;
-            InitializeCore.EqualizerSettingsHelper = new RoamingSettingsHelper();
-            InitializeCore.IsMobile = Windows.Foundation.Metadata.ApiInformation.IsApiContractPresent("Windows.Phone.PhoneContract", 1);
+            //InitializeCore.Dispatcher = new Dispatcher.BreadDispatcher(Dispatcher);
+            //InitializeCore.NotificationManager = NotificationManager;
+            //InitializeCore.EqualizerSettingsHelper = new RoamingSettingsHelper();
+            //InitializeCore.IsMobile = Windows.Foundation.Metadata.ApiInformation.IsApiContractPresent("Windows.Phone.PhoneContract", 1);
 
-            InitializeCore.IsMobile = Window.Current?.Bounds.Width <= 600;
+            //InitializeCore.IsMobile = Window.Current?.Bounds.Width <= 600;
         }
-        public static string DatabasePath { get => Path.Combine(ApplicationData.Current.LocalFolder.Path, "BreadPlayerDB"); }
-        public System.Collections.ObjectModel.ObservableCollection<SimpleNavMenuItem> PlaylistsItems => GenericService<System.Collections.ObjectModel.ObservableCollection<SimpleNavMenuItem>>.Instance.GenericClass;
-        public ThreadSafeObservableCollection<ContextMenuCommand> OptionItems => GenericService<ThreadSafeObservableCollection<ContextMenuCommand>>.Instance.GenericClass;// { get { return items; } set { Set(ref items, value); } }
+        public string DatabasePath { get => Path.Combine(ApplicationData.Current.LocalFolder.Path, "BreadPlayerDB"); }
+        public static System.Collections.ObjectModel.ObservableCollection<SimpleNavMenuItem> PlaylistsItems => GenericService<System.Collections.ObjectModel.ObservableCollection<SimpleNavMenuItem>>.Instance.GenericClass;
+        public static ThreadSafeObservableCollection<ContextMenuCommand> OptionItems => GenericService<ThreadSafeObservableCollection<ContextMenuCommand>>.Instance.GenericClass;// { get { return items; } set { Set(ref items, value); } }
         public static BreadNotificationManager NotificationManager => GenericService<BreadNotificationManager>.Instance.GenericClass;// { get { return items; } set { Set(ref items, value); } }
         static CoreBreadPlayer player;
-        public static CoreBreadPlayer Player
+        public CoreBreadPlayer Player
         {
             get
             {
@@ -51,8 +53,8 @@ namespace BreadPlayer.Core
         }
         public static CoreDispatcher Dispatcher { get; set; } = Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher;
         public static SettingsViewModel SettingsVM => GenericService<SettingsViewModel>.Instance.GenericClass;
-        static Lastfm lastfmScrobbler;
-        public static Lastfm LastfmScrobbler
+        Lastfm lastfmScrobbler;
+        public Lastfm LastfmScrobbler
         {
             get
             {
@@ -223,7 +225,7 @@ namespace BreadPlayer.Core
         /// Asynchronously saves all the album arts in the library. 
         /// </summary>
         /// <param name="Data">ID3 tag of the song to get album art data from.</param>
-        public static async Task<bool> SaveImagesAsync(StorageFile file, Mediafile mediafile)
+        public async Task<bool> SaveAlbumArtAsync(Mediafile mediafile)
         {
             var albumArt = AlbumArtFileExists(mediafile);
             if (!albumArt.NotExists)
@@ -231,6 +233,7 @@ namespace BreadPlayer.Core
 
             try
             {
+                var file = await StorageFile.GetFileFromPathAsync(mediafile.Path);
                 using (StorageItemThumbnail thumbnail = await file.GetThumbnailAsync(ThumbnailMode.MusicView, 300, ThumbnailOptions.UseCurrentScale))
                 {
                     if (thumbnail == null) return false;
@@ -270,7 +273,7 @@ namespace BreadPlayer.Core
             }
             catch (Exception ex)
             {
-                await NotificationManager.ShowMessageAsync(ex.Message + "||" + file.Path);
+                await CrossPlatformHelper.NotificationManager.ShowMessageAsync(ex.Message + "||" + mediafile.Path);
             }
 
             return false;
@@ -280,7 +283,7 @@ namespace BreadPlayer.Core
         {
             if (file == null) return false;
 
-            using (var service = new LibraryService(new KeyValueStoreDatabaseService(DatabasePath, "Tracks", "TracksText")))
+            using (var service = new LibraryService(new KeyValueStoreDatabaseService(Init.SharedLogic.DatabasePath, "Tracks", "TracksText")))
             {
                 SettingsViewModel.TracksCollection.Elements.Insert(index == -1 ? SettingsViewModel.TracksCollection.Elements.Count : index, file);
                 service.AddMediafile(file);
@@ -291,7 +294,7 @@ namespace BreadPlayer.Core
         {
             if (file == null) return false;
 
-            using (var service = new LibraryService(new KeyValueStoreDatabaseService(DatabasePath, "Tracks", "TracksText")))
+            using (var service = new LibraryService(new KeyValueStoreDatabaseService(Init.SharedLogic.DatabasePath, "Tracks", "TracksText")))
             {
                 SettingsViewModel.TracksCollection.Elements.Remove(file);
                 await service.RemoveMediafile(file);
@@ -308,16 +311,16 @@ namespace BreadPlayer.Core
             task.Start();
             return task.Wait(timeout) && task.Result;
         }
-        public static async Task<Mediafile> CreateMediafile(StorageFile file, bool cache = false)
+        public async Task<Mediafile> CreateMediafile(string path, bool cache = false)
         {
             var mediafile = new Mediafile();
             try
-            {               
+            {
+                var file = await StorageFile.GetFileFromPathAsync(path);
                 if (cache == true)
                 {
                     Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.Add(file);
                 }
-               
                 mediafile.Path = file.Path;
                 mediafile.OrginalFilename = file.DisplayName;
                 var properties = await file.Properties.GetMusicPropertiesAsync(); //(await file.Properties.RetrievePropertiesAsync(new List<string>() { "System.Music.AlbumTitle", "System.Music.Artist", "System.Music.Genre" }));//.GetMusicPropertiesAsync();
@@ -339,11 +342,11 @@ namespace BreadPlayer.Core
             }
             catch (Exception ex)
             {
-                await NotificationManager.ShowMessageAsync(ex.Message + "||" + file.Path);
+                await CrossPlatformHelper.NotificationManager.ShowMessageAsync(ex.Message + "||" + path);
             }
             return mediafile;
         }
-        public async Task<bool> AskForPassword(Playlist playlist)
+        public async Task<bool> AskPasswordForPlaylist(Playlist playlist)
         {
             if (playlist.IsPrivate)
             {

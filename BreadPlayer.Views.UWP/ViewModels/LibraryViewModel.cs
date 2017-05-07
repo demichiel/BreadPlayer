@@ -38,6 +38,8 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using BreadPlayer.Database;
+using BreadPlayer.Helpers;
+using BreadPlayer.Models.Common;
 
 namespace BreadPlayer.ViewModels
 {
@@ -152,7 +154,7 @@ namespace BreadPlayer.ViewModels
         public LibraryService LibraryService
         {
             get { if (libraryservice == null)
-                    libraryservice = new LibraryService(new KeyValueStoreDatabaseService(SharedLogic.DatabasePath, "Tracks", "TracksText"));
+                    libraryservice = new LibraryService(new KeyValueStoreDatabaseService(ViewModels.Init.SharedLogic.DatabasePath, "Tracks", "TracksText"));
                 return libraryservice; }
             set { Set(ref libraryservice, value); }
         }
@@ -163,7 +165,7 @@ namespace BreadPlayer.ViewModels
             get
             {
                 if (playlistService == null)
-                    playlistService = new PlaylistService(new KeyValueStoreDatabaseService(SharedLogic.DatabasePath, "Playlists", "PlaylistsText"));
+                    playlistService = new PlaylistService(new KeyValueStoreDatabaseService(ViewModels.Init.SharedLogic.DatabasePath, "Playlists", "PlaylistsText"));
                 return playlistService;
             }
             set { Set(ref playlistService, value); }
@@ -396,7 +398,7 @@ namespace BreadPlayer.ViewModels
                 var newFile = await openPicker.PickSingleFileAsync();
                 if (newFile != null)
                 {
-                    var newMediafile = await SharedLogic.CreateMediafile(newFile);
+                    var newMediafile = await ViewModels.Init.SharedLogic.CreateMediafile(newFile.Path);
                     TracksCollection.Elements.Single(t => t.Path == mediafile.Path).Length = newMediafile.Length;
                     TracksCollection.Elements.Single(t => t.Path == mediafile.Path).Id = newMediafile.Id;
                     TracksCollection.Elements.Single(t => t.Path == mediafile.Path).Path = newMediafile.Path;
@@ -452,7 +454,7 @@ namespace BreadPlayer.ViewModels
             }
             catch (Exception ex)
             {
-                BLogger.Logger.Error("Error occured while deleting a song from collection and list.", ex);
+                CrossPlatformHelper.Log.E("Error occured while deleting a song from collection and list.", ex);
             }
         }
         
@@ -737,7 +739,7 @@ namespace BreadPlayer.ViewModels
             }
             catch(ArgumentOutOfRangeException ex)
             {
-                await NotificationManager.ShowMessageAsync("Unable to update jumplist due to some problem with TracksCollection. ERROR INFO: " + ex.Message);
+                await CrossPlatformHelper.NotificationManager.ShowMessageAsync("Unable to update jumplist due to some problem with TracksCollection. ERROR INFO: " + ex.Message);
             }
         }
         
@@ -799,13 +801,13 @@ namespace BreadPlayer.ViewModels
                             {
                                 try
                                 {
-                                    mp3file = await SharedLogic.CreateMediafile(item as StorageFile);
+                                    mp3file = await ViewModels.Init.SharedLogic.CreateMediafile((item as StorageFile).Path);
                                     await SettingsViewModel.SaveSingleFileAlbumArtAsync(mp3file).ConfigureAwait(false);
                                     SharedLogic.AddMediafile(mp3file);
                                 }
                                 catch (Exception ex)
                                 {
-                                    BLogger.Logger.Error("Error occured while drag/drop operation.", ex);
+                                    CrossPlatformHelper.Log.E("Error occured while drag/drop operation.", ex);
                                 }
                             }
                         }
@@ -894,7 +896,7 @@ namespace BreadPlayer.ViewModels
                 Playlist dictPlaylist = menu.Text == "New Playlist" ? await ShowAddPlaylistDialogAsync() : await PlaylistService.GetPlaylistAsync(menu?.Text);
                 bool proceed = false;
                 if (menu.Text != "New Playlist")
-                    proceed = await SharedLogic.AskForPassword(dictPlaylist);
+                    proceed = await ViewModels.Init.SharedLogic.AskPasswordForPlaylist(dictPlaylist);
                 else
                     proceed = true;
                 if (dictPlaylist != null && proceed)
@@ -1001,8 +1003,8 @@ namespace BreadPlayer.ViewModels
             {
                 libraryLoaded = true;
                 await CreateGenreMenu().ConfigureAwait(false);
-                BLogger.Logger.Info("Library successfully loaded!");
-                await NotificationManager.ShowMessageAsync("Library successfully loaded!", 4);
+                CrossPlatformHelper.Log.I("Library successfully loaded!");
+                await CrossPlatformHelper.NotificationManager.ShowMessageAsync("Library successfully loaded!", 4);
                 Messenger.Instance.NotifyColleagues(MessageTypes.MSG_LIBRARY_LOADED, new List<object>() { TracksCollection, grouped });
                 await Task.Delay(10000);
                 Common.DirectoryWalker.SetupDirectoryWatcher(SharedLogic.SettingsVM.LibraryFoldersCollection);

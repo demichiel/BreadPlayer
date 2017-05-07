@@ -33,6 +33,8 @@ using Windows.Storage.Streams;
 using Windows.UI.Xaml;
 using System.IO;
 using BreadPlayer.ViewModels;
+using BreadPlayer.Helpers;
+using BreadPlayer.Models.Common;
 
 namespace BreadPlayer
 {
@@ -68,15 +70,15 @@ namespace BreadPlayer
                 if (path != "" && SharedLogic.VerifyFileExists(path, 300))
                 {
                     double position = RoamingSettingsHelper.GetSetting<double>(posKey, 0);
-                    SharedLogic.Player.PlayerState = PlayerState.Paused;
+                    Init.SharedLogic.Player.PlayerState = PlayerState.Paused;
                     try
                     {
                         Messengers.Messenger.Instance.NotifyColleagues(Messengers.MessageTypes.MSG_EXECUTE_CMD,
-                            new List<object> { await StorageFile.GetFileFromPathAsync(path), position, play, volume });
+                            new List<object> { path, position, play, volume });
                     }
                     catch (UnauthorizedAccessException ex)
                     {
-                        BLogger.Logger.Error("Access denied while trying to play file on startup.", ex);
+                        CrossPlatformHelper.Log.E("Access denied while trying to play file on startup.", ex);
                     }
                 }
             }
@@ -84,12 +86,12 @@ namespace BreadPlayer
 
         public static void SaveSettings()
         {
-            if (SharedLogic.Player.CurrentlyPlayingFile != null && !string.IsNullOrEmpty(SharedLogic.Player.CurrentlyPlayingFile.Path))
+            if (Init.SharedLogic.Player.CurrentlyPlayingFile != null && !string.IsNullOrEmpty(Init.SharedLogic.Player.CurrentlyPlayingFile.Path))
             {
-                ApplicationData.Current.RoamingSettings.Values[pathKey] = SharedLogic.Player.CurrentlyPlayingFile.Path;
-                ApplicationData.Current.RoamingSettings.Values[posKey] = SharedLogic.Player.Position;
+                ApplicationData.Current.RoamingSettings.Values[pathKey] = Init.SharedLogic.Player.CurrentlyPlayingFile.Path;
+                ApplicationData.Current.RoamingSettings.Values[posKey] = Init.SharedLogic.Player.Position;
             }
-            ApplicationData.Current.RoamingSettings.Values[volKey] = SharedLogic.Player.Volume;
+            ApplicationData.Current.RoamingSettings.Values[volKey] = Init.SharedLogic.Player.Volume;
             ApplicationData.Current.RoamingSettings.Values[timeclosedKey] = DateTimeOffset.Now.ToString("yyyy-MM-dd HH:mm:ss");
             string folderPaths = "";
             SharedLogic.SettingsVM.LibraryFoldersCollection.ToList().ForEach(new Action<StorageFolder>((StorageFolder folder) => { folderPaths += folder.Path + "|"; }));
@@ -115,7 +117,7 @@ namespace BreadPlayer
             _smtc.IsPreviousEnabled = true;
             _smtc.PlaybackStatus = MediaPlaybackStatus.Closed;
             _smtc.AutoRepeatMode = MediaPlaybackAutoRepeatMode.Track;
-            SharedLogic.Player.MediaStateChanged += Player_MediaStateChanged;
+            Init.SharedLogic.Player.MediaStateChanged += Player_MediaStateChanged;
         }
 
         private async static void PlaybackSession_PlaybackStateChanged(MediaPlaybackSession sender, object args)
@@ -136,7 +138,7 @@ namespace BreadPlayer
             _smtc.DisplayUpdater.Type = MediaPlaybackType.Music;
             var musicProps = _smtc.DisplayUpdater.MusicProperties;
             _smtc.DisplayUpdater.ClearAll();
-            if (SharedLogic.Player.CurrentlyPlayingFile != null)
+            if (Init.SharedLogic.Player.CurrentlyPlayingFile != null)
             {
                 if (ApiInformation.IsApiContractPresent("Windows.Phone.PhoneContract", 1))
                 {
@@ -146,11 +148,11 @@ namespace BreadPlayer
                     player.Play();
                     player.Volume = 0;
                 }
-                musicProps.Title = SharedLogic.Player.CurrentlyPlayingFile.Title;
-                musicProps.Artist = SharedLogic.Player.CurrentlyPlayingFile.LeadArtist;
-                musicProps.AlbumTitle = SharedLogic.Player.CurrentlyPlayingFile.Album;
-                if (!string.IsNullOrEmpty(SharedLogic.Player.CurrentlyPlayingFile.AttachedPicture))
-                    _smtc.DisplayUpdater.Thumbnail = RandomAccessStreamReference.CreateFromFile(await StorageFile.GetFileFromPathAsync(SharedLogic.Player.CurrentlyPlayingFile.AttachedPicture));
+                musicProps.Title = Init.SharedLogic.Player.CurrentlyPlayingFile.Title;
+                musicProps.Artist = Init.SharedLogic.Player.CurrentlyPlayingFile.LeadArtist;
+                musicProps.AlbumTitle = Init.SharedLogic.Player.CurrentlyPlayingFile.Album;
+                if (!string.IsNullOrEmpty(Init.SharedLogic.Player.CurrentlyPlayingFile.AttachedPicture))
+                    _smtc.DisplayUpdater.Thumbnail = RandomAccessStreamReference.CreateFromFile(await StorageFile.GetFileFromPathAsync(Init.SharedLogic.Player.CurrentlyPlayingFile.AttachedPicture));
                 else
                     _smtc.DisplayUpdater.Thumbnail = RandomAccessStreamReference.CreateFromUri(new Uri("ms-appx:///Assets/albumart.png"));
             }
@@ -211,7 +213,7 @@ namespace BreadPlayer
         #region CoreWindow Dispose Methods
         public void DisposeObjects()
         {
-            SharedLogic.Player.Dispose();
+            Init.SharedLogic.Player.Dispose();
         }
         #endregion
 
@@ -253,7 +255,7 @@ namespace BreadPlayer
             }
             catch (Exception ex)
             {
-                BLogger.Logger.Error("Error occured while updating tile.", ex);
+                CrossPlatformHelper.Log.E("Error occured while updating tile.", ex);
             }
         }
 
@@ -263,14 +265,14 @@ namespace BreadPlayer
             if (StorageApplicationPermissions.FutureAccessList.Entries.Count >= 999)
                 StorageApplicationPermissions.FutureAccessList.Clear();
             InitSmtc();
-            SharedLogic.Player.Volume = RoamingSettingsHelper.GetSetting<double>(volKey, 50.0);
+            Init.SharedLogic.Player.Volume = RoamingSettingsHelper.GetSetting<double>(volKey, 50.0);
             Window.Current.SizeChanged += Current_SizeChanged;
             var vm = (App.Current.Resources["AccountsVM"] as AccountsViewModel);
         }
 
         private void Current_SizeChanged(object sender, Windows.UI.Core.WindowSizeChangedEventArgs e)
         {
-            InitializeCore.IsMobile = e.Size.Width <= 600;
+            CrossPlatformHelper.IsMobile = e.Size.Width <= 600;
         }
         #endregion
 

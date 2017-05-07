@@ -98,7 +98,7 @@ namespace BreadPlayer.Core
         }
         private void LoadEqualizerSettings()
         {
-            var eqConfig = CrossPlatformHelper.EqualizerSettingsHelper.LoadEqualizerSettings();
+            var eqConfig = CrossPlatformHelper.SettingsHelper.LoadEqualizerSettings();
             OldEqualizerSettings = eqConfig.EqConfig;
             EnableEq = eqConfig.IsEnabled;
             Preamp = eqConfig.PreAMP;
@@ -109,7 +109,7 @@ namespace BreadPlayer.Core
         }
         private void SaveEqualizerSettings()
         {
-            CrossPlatformHelper.EqualizerSettingsHelper.SaveEqualizerSettings(EqualizerBands.Select(t => t.Gain).ToArray(), EnableEq, Preamp);
+            CrossPlatformHelper.SettingsHelper.SaveEqualizerSettings(EqualizerBands.Select(t => t.Gain).ToArray(), EnableEq, Preamp);
         }
         private void SetAllEqualizerBandsFrequencies(float[] frequencies)
         {

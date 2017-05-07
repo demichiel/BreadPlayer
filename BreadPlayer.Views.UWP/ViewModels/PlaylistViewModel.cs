@@ -31,6 +31,8 @@ using System.IO;
 using Windows.Storage;
 using BreadPlayer.Database;
 using System.Threading.Tasks;
+using BreadPlayer.Helpers;
+using BreadPlayer.Models.Common;
 
 namespace BreadPlayer.ViewModels
 {
@@ -112,7 +114,7 @@ namespace BreadPlayer.ViewModels
             }
             catch (Exception ex)
             {
-                BLogger.Logger.Error("Error occured while deleting song from playlist.", ex);
+                CrossPlatformHelper.Log.E("Error occured while deleting song from playlist.", ex);
             }
         }
         public async Task Refresh()
@@ -135,7 +137,7 @@ namespace BreadPlayer.ViewModels
                 }
                 catch (Exception ex)
                 {
-                    BLogger.Logger.Error("Error occured while refreshing playlist.", ex);
+                    CrossPlatformHelper.Log.E("Error occured while refreshing playlist.", ex);
                 }
             });
         }
@@ -164,7 +166,7 @@ namespace BreadPlayer.ViewModels
             {
                 var selectedPlaylist = playlist != null ? playlist as Playlist : Playlist; //get the dictionary containing playlist and songs.
               
-                if (selectedPlaylist != null && await SharedLogic.AskForPassword(selectedPlaylist))
+                if (selectedPlaylist != null && await ViewModels.Init.SharedLogic.AskPasswordForPlaylist(selectedPlaylist))
                 {
                     MessageDialog dia = new MessageDialog("Do you want to delete this playlist?", "Confirmation");
                     dia.Commands.Add(new Windows.UI.Popups.UICommand("Yes") { Id = 0 });
@@ -187,7 +189,7 @@ namespace BreadPlayer.ViewModels
             }
             catch (Exception ex)
             {
-                BLogger.Logger.Error("Error occured while deleting playlist.", ex);
+                CrossPlatformHelper.Log.E("Error occured while deleting playlist.", ex);
             }
         }
 
@@ -196,7 +198,7 @@ namespace BreadPlayer.ViewModels
             try
             {
                 var selectedPlaylist = playlist != null ? playlist as Playlist : Playlist; //get the playlist to delete.                    
-                if (await SharedLogic.AskForPassword(selectedPlaylist))
+                if (await ViewModels.Init.SharedLogic.AskPasswordForPlaylist(selectedPlaylist))
                 {
                     var dialog = new InputDialog()
                     {
@@ -221,12 +223,12 @@ namespace BreadPlayer.ViewModels
             }
             catch (Exception)
             {
-                await NotificationManager.ShowMessageAsync("Cannot rename playlist. Please try again.");
+                await CrossPlatformHelper.NotificationManager.ShowMessageAsync("Cannot rename playlist. Please try again.");
             }
         }
         public PlaylistViewModel()
         {
-            PlaylistService = new PlaylistService(new KeyValueStoreDatabaseService(Core.SharedLogic.DatabasePath, "", ""));
+            PlaylistService = new PlaylistService(new KeyValueStoreDatabaseService(ViewModels.Init.SharedLogic.DatabasePath, "", ""));
         }
         public void Init(object data)
         {
@@ -245,7 +247,7 @@ namespace BreadPlayer.ViewModels
         }
         async void LoadAlbumSongs(Album album)
         {
-            Songs.AddRange(await new LibraryService(new KeyValueStoreDatabaseService(Core.SharedLogic.DatabasePath, "Tracks","TracksText")).Query(album.AlbumName));
+            Songs.AddRange(await new LibraryService(new KeyValueStoreDatabaseService(ViewModels.Init.SharedLogic.DatabasePath, "Tracks","TracksText")).Query(album.AlbumName));
             await Refresh().ContinueWith((task) =>
             {
                 Messengers.Messenger.Instance.NotifyColleagues(Messengers.MessageTypes.MSG_PLAYLIST_LOADED, Songs);
@@ -253,7 +255,7 @@ namespace BreadPlayer.ViewModels
         }
         async void LoadDB()
         {
-            if (await SharedLogic.AskForPassword(playlist))
+            if (await ViewModels.Init.SharedLogic.AskPasswordForPlaylist(playlist))
             {
                 Songs.AddRange(await PlaylistService.GetTracksAsync(playlist.Id));
                 await Refresh().ContinueWith((task) =>

@@ -4,8 +4,8 @@ using System.Text;
 
 namespace BreadPlayer.Helpers.Interfaces
 {
-    public interface IThemeManager
+    public abstract class IThemeManager
     {
-        void SetThemeColor(string albumArtPath);
+        public virtual void SetThemeColor(string albumArtPath) { }
     }
 }

@@ -1,28 +1,28 @@
-﻿using BreadPlayer.Core.Common;
+﻿using BreadPlayer.Helpers.Interfaces;
 using Windows.Storage;
 
 namespace BreadPlayer.Helpers
 {
-    public class RoamingSettingsHelper : IEqualizerSettingsHelper
+    public class RoamingSettingsHelper : SettingsHelper
     {
-        public static void SaveSetting(string key, object value)
+        public new static void SaveSetting(string key, object value)
         {
             ApplicationData.Current.RoamingSettings.Values[key] = value;
         }
-        public static T GetSetting<T>(string key, object def)
+        public new static T GetSetting<T>(string key, object def)
         {
             object setting = ApplicationData.Current.RoamingSettings.Values[key] ?? def;
             return (T)setting;
         }
 
-        public (float[] EqConfig, bool IsEnabled, float PreAMP) LoadEqualizerSettings()
+        public override (float[] EqConfig, bool IsEnabled, float PreAMP) LoadEqualizerSettings()
         {
             return (GetSetting<float[]>("EqualizerConfig", new float[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }),
                     GetSetting<bool>("IsEqEnabled", false),
                     GetSetting<float>("PreAMP", 1));
         }
 
-        public void SaveEqualizerSettings(float[] eqConfig, bool isEnabled, float PreAMP)
+        public override void SaveEqualizerSettings(float[] eqConfig, bool isEnabled, float PreAMP)
         {
             SaveSetting("EqualizerConfig", eqConfig);
             SaveSetting("IsEqEnabled", isEnabled);
