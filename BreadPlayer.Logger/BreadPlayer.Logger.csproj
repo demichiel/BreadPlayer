@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.4</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="PCLStorage">
+      <HintPath>..\libs\PCLStorage.dll</HintPath>
+    </Reference>
+    <Reference Include="PCLStorage.Abstractions">
+      <HintPath>..\libs\PCLStorage.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="XLog">
+      <HintPath>..\libs\XLog.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

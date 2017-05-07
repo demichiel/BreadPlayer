@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace BreadPlayer.Core.Interfaces
+namespace BreadPlayer.Helpers.Interfaces
 {
     public interface IDispatcher
     {

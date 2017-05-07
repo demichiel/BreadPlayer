@@ -21,7 +21,7 @@ using System.Runtime.CompilerServices;
 using System;
 using Windows.UI.Core;
 
-namespace BreadPlayer
+namespace BreadPlayer.ViewModels
 {
    public class ViewModelBase : INotifyPropertyChanged
     {

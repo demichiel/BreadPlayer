@@ -133,8 +133,6 @@
     <Compile Include="Behaviours\ItemClickedBehaviour.cs" />
     <Compile Include="Behaviours\ListViewFocusBeforeSelectBehaviour.cs" />
     <Compile Include="Behaviours\OpenMenuBehaviour.cs" />
-    <Compile Include="BreadLogger\AsyncFileTarget.cs" />
-    <Compile Include="BreadLogger\BLogger.cs" />
     <Compile Include="Common\BackDrop.cs" />
     <Compile Include="Common\DeviceInfoHelper.cs" />
     <Compile Include="Common\DirectoryWalker.cs" />
@@ -212,7 +210,6 @@
     </Compile>
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
     <Compile Include="ViewModels\ShellViewModel.cs" />
-    <Compile Include="Common\ViewModelBase.cs" />
     <Compile Include="HamburgerMenu\INavigationMenuItem.cs" />
     <Compile Include="HamburgerMenu\NavMenuListView.cs" />
     <Compile Include="HamburgerMenu\SimpleNavMenuItem.cs" />

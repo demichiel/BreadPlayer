@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BreadPlayer.Helpers;
+using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
@@ -43,8 +44,10 @@ public class ObservableObject : INotifyPropertyChanged
     /// <param name="args">The arguments. </param>
     protected async virtual void RaisePropertyChanged(PropertyChangedEventArgs args)
     {
-        if (InitializeFramework.Dispatcher != null)
-            await InitializeFramework.Dispatcher?.RunAsync(() => { PropertyChanged?.Invoke(this, args); });
+        if (CrossPlatformHelper.Dispatcher != null)
+        {
+            await CrossPlatformHelper.Dispatcher?.RunAsync(() => { PropertyChanged?.Invoke(this, args); });
+        }
         else
             PropertyChanged?.Invoke(this, args);
     }

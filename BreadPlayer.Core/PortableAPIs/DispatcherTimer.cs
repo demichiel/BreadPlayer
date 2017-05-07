@@ -1,4 +1,4 @@
-﻿using BreadPlayer.Core.Interfaces;
+﻿using BreadPlayer.Helpers.Interfaces;
 using System;
 using System.Threading;
 

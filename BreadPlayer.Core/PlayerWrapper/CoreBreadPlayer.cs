@@ -21,6 +21,7 @@ using ManagedBass;
 using BreadPlayer.Events;
 using BreadPlayer.Models;
 using BreadPlayer.Core.Events;
+using BreadPlayer.Helpers;
 
 namespace BreadPlayer.Core
 {
@@ -99,7 +100,7 @@ namespace BreadPlayer.Core
             {
                 try
                 {
-                    await InitializeCore.Dispatcher.RunAsync(() => { MediaChanging?.Invoke(this, new EventArgs()); });
+                    await CrossPlatformHelper.Dispatcher.RunAsync(() => { MediaChanging?.Invoke(this, new EventArgs()); });
                    
                     string path = mediaFile.Path;                    
                     await Stop();
@@ -123,7 +124,7 @@ namespace BreadPlayer.Core
                 }
                 catch(Exception ex)
                 {
-                    await InitializeCore.NotificationManager.ShowMessageAsync(ex.Message + "||" + mediaFile.OrginalFilename);
+                    await CrossPlatformHelper.NotificationManager.ShowMessageAsync(ex.Message + "||" + mediaFile.OrginalFilename);
                 }
             }
             else
@@ -131,11 +132,11 @@ namespace BreadPlayer.Core
                 string error = "The file " + mediaFile.OrginalFilename + " is either corrupt, incomplete or unavailable. \r\n\r\n Exception details: No data available.";
                 if (IgnoreErrors)
                 {
-                    await InitializeCore.NotificationManager.ShowMessageAsync(error);
+                    await CrossPlatformHelper.NotificationManager.ShowMessageAsync(error);
                 }
                 else
                 {
-                    await InitializeCore.NotificationManager.ShowMessageBoxAsync(error, "File corrupt");
+                    await CrossPlatformHelper.NotificationManager.ShowMessageBoxAsync(error, "File corrupt");
                 }          
             }
             return false;

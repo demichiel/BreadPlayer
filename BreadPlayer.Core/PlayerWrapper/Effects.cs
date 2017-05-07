@@ -21,6 +21,7 @@ using ManagedBass.Fx;
 using System.Collections.ObjectModel;
 using System.Linq;
 using BreadPlayer.Core.Models;
+using BreadPlayer.Helpers;
 
 namespace BreadPlayer.Core
 {
@@ -97,7 +98,7 @@ namespace BreadPlayer.Core
         }
         private void LoadEqualizerSettings()
         {
-            var eqConfig = InitializeCore.EqualizerSettingsHelper.LoadEqualizerSettings();
+            var eqConfig = CrossPlatformHelper.EqualizerSettingsHelper.LoadEqualizerSettings();
             OldEqualizerSettings = eqConfig.EqConfig;
             EnableEq = eqConfig.IsEnabled;
             Preamp = eqConfig.PreAMP;
@@ -108,7 +109,7 @@ namespace BreadPlayer.Core
         }
         private void SaveEqualizerSettings()
         {
-            InitializeCore.EqualizerSettingsHelper.SaveEqualizerSettings(EqualizerBands.Select(t => t.Gain).ToArray(), EnableEq, Preamp);
+            CrossPlatformHelper.EqualizerSettingsHelper.SaveEqualizerSettings(EqualizerBands.Select(t => t.Gain).ToArray(), EnableEq, Preamp);
         }
         private void SetAllEqualizerBandsFrequencies(float[] frequencies)
         {

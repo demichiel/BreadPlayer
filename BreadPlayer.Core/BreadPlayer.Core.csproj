@@ -106,15 +106,12 @@
     <Compile Include="Common\DelegateCommand.cs" />
     <Compile Include="Common\Enums.cs" />
     <Compile Include="Common\ICommand.cs" />
-    <Compile Include="Common\INotificationManager.cs" />
-    <Compile Include="Common\IEqualizerSettingsHelper.cs" />
     <Compile Include="Common\PasswordStorage.cs" />
     <Compile Include="Events\MediaAboutToEndEventArgs.cs" />
     <Compile Include="Events\MediaEndedEventArgs.cs" />
     <Compile Include="Events\MediaStateChangedEventArgs.cs" />
     <Compile Include="Extensions\ObservableCollection.cs" />
     <Compile Include="Common\IDBRecord.cs" />
-    <Compile Include="InitializeCore.cs" />
     <Compile Include="Models\Album.cs" />
     <Compile Include="Models\EqualizerBand.cs" />
     <Compile Include="Models\Mediafile.cs" />
@@ -126,12 +123,6 @@
     <Compile Include="PlayerWrapper\NativeMethods.cs" />
     <Compile Include="PortableAPIs\DispatcherTimer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\BreadPlayer.Framework\BreadPlayer.Framework.csproj">
-      <Project>{f22742c9-7088-4325-9f87-0a1aa34dda74}</Project>
-      <Name>BreadPlayer.Framework</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="project.json" />
@@ -146,6 +137,16 @@
     <Reference Include="XLog">
       <HintPath>..\libs\XLog.dll</HintPath>
     </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BreadPlayer.Framework\BreadPlayer.Framework.csproj">
+      <Project>{f22742c9-7088-4325-9f87-0a1aa34dda74}</Project>
+      <Name>BreadPlayer.Framework</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BreadPlayer.Helpers\BreadPlayer.Helpers.csproj">
+      <Project>{1bc3c477-bb82-4856-bd8a-f0deec4b25a7}</Project>
+      <Name>BreadPlayer.Helpers</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
