@@ -9,5 +9,6 @@ namespace BreadPlayer.Helpers.Interfaces
     public interface IFilePickerHelper
     {
         Task<string> PickFileAsync(IEnumerable<string> filters);
+        Task<Stream> SaveFileAsync(IDictionary<string, IList<string>> filters);
     }
 }

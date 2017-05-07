@@ -177,9 +177,6 @@
     <Compile Include="Helpers\PlaylistHelper.cs" />
     <Compile Include="Helpers\SliderHelper.cs" />
     <Compile Include="Helpers\WindowHelper.cs" />
-    <Compile Include="PlaylistBus\IPlaylist.cs" />
-    <Compile Include="PlaylistBus\M3U.cs" />
-    <Compile Include="PlaylistBus\PLS.cs" />
     <Compile Include="Services\NavigationService.cs" />
     <Compile Include="StateTriggers\AdaptiveTriggerWithCondition.cs" />
     <Compile Include="StateTriggers\DeviceFamilyWithConditionStateTrigger.cs" />
@@ -435,6 +432,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\libs\XLog.dll</HintPath>
     </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="PlaylistBus\" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

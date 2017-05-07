@@ -1,26 +1,18 @@
-﻿using BreadPlayer.Models;
-using BreadPlayer.Database;
-using BreadPlayer.ViewModels;
+﻿using BreadPlayer.Database;
+using BreadPlayer.Helpers;
+using BreadPlayer.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using Windows.Storage;
-using Windows.Storage.AccessCache;
-using Windows.Storage.Pickers;
-using BreadPlayer.Core;
-using BreadPlayer.Helpers;
 
 namespace BreadPlayer.PlaylistBus
 {
     class PLS : IPlaylist
     {
-        public async Task LoadPlaylist(StorageFile file)
+        public async Task<IEnumerable<string>> LoadPlaylist(string playlistPath)
         {
-            //Core.CoreMethods.LibVM.Database.CreatePlaylistDB(file.DisplayName);
-            //Dictionary<Playlist, IEnumerable<Mediafile>> PlaylistDict = new Dictionary<Models.Playlist, IEnumerable<Mediafile>>();
-            Playlist Playlist = new Playlist() { Name = file.DisplayName };
-            using (var reader = new StreamReader(await file.OpenStreamForReadAsync()))
+            using (var reader = new StreamReader(new FileStream(playlistPath, FileMode.Open, FileAccess.Read)))
             {
                 bool hdr = false; //[playlist] header
                 string version = ""; //pls version at the end
@@ -30,9 +22,7 @@ namespace BreadPlayer.PlaylistBus
                 int count = 0;
                 string line; //a single line in stream
                 List<string> lines = new List<string>();
-                List<Mediafile> PlaylistSongs = new List<Mediafile>();
-                PlaylistService service = new PlaylistService(new KeyValueStoreDatabaseService(Init.SharedLogic.DatabasePath, "", ""));
-                await service.AddPlaylistAsync(Playlist);
+                List<string> Songs = new List<string>();
                 while ((line = reader.ReadLine()) != null)
                 {
                     lines.Add(line);
@@ -40,7 +30,7 @@ namespace BreadPlayer.PlaylistBus
                     if (line == "[playlist]")
                         hdr = true;
                     else if (!hdr)
-                        return;
+                        return null;
                     else if (line.ToLower().StartsWith("numberofentries="))
                         noe = Convert.ToInt32(line.Split('=')[1]);
                     else if (line.ToLower().StartsWith("version="))
@@ -71,50 +61,37 @@ namespace BreadPlayer.PlaylistBus
                         continue;
                     }
                 }
-               
+
                 for (int i = 0; i < noe; i++)
                 {
-                    await Task.Run(async () =>
+                    try
                     {
-                        try
+                        string trackPath = tracks[i, 0];
+                        FileInfo info = new FileInfo(playlistPath);//get playlist file info to get directory path
+                        string path = trackPath;
+                        if (!File.Exists(trackPath) && line[1] != ':') // if file doesn't exist then perhaps the path is relative
                         {
-                          
-                            string trackPath = tracks[i, 0];
-                            FileInfo info = new FileInfo(file.Path);//get playlist file info to get directory path
-                            string path = trackPath;
-                            if (!File.Exists(trackPath) && line[1] != ':') // if file doesn't exist then perhaps the path is relative
-                            {
-                                path = info.DirectoryName + line; //add directory path to song path.
-                            }
-                            var accessFile = await StorageFile.GetFileFromPathAsync(path);
-                            var token = Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.Add(accessFile);
-
-                            Mediafile mp3File = await Init.SharedLogic.CreateMediafile(accessFile.Path); //prepare Mediafile
-                            await SettingsViewModel.SaveSingleFileAlbumArtAsync(mp3File, accessFile);
-
-                            await CrossPlatformHelper.NotificationManager.ShowMessageAsync(i.ToString() + " of " + noe.ToString() + " songs added into playlist: " + file.DisplayName);
-                            PlaylistSongs.Add(mp3File);
-                            StorageApplicationPermissions.FutureAccessList.Remove(token);
+                            path = info.DirectoryName + line; //add directory path to song path.
                         }
-                        catch
-                        {
-                            failedFiles++;
-                        }
-                    });
-                    await service.InsertTracksAsync(PlaylistSongs, Playlist);
+                        Songs.Add(path);
+                    }
+                    catch
+                    {
+                        failedFiles++;
+                    }
                 }
-                string message = string.Format("Playlist \"{3}\" successfully imported! Total Songs: {0} Failed: {1} Succeeded: {2}", count, failedFiles, count - failedFiles, file.DisplayName);
+                string message = string.Format("Playlist \"{3}\" successfully imported! Total Songs: {0} Failed: {1} Succeeded: {2}", count, failedFiles, count - failedFiles, Path.GetFileNameWithoutExtension(playlistPath));
                 await CrossPlatformHelper.NotificationManager.ShowMessageAsync(message);
+                CrossPlatformHelper.Log.I(message);
+                return Songs;
             }
         }
 
         public async Task<bool> SavePlaylist(IEnumerable<Mediafile> Songs)
         {
-            FileSavePicker picker = new FileSavePicker();
-            picker.FileTypeChoices.Add("M3U Playlists", new List<string>() { ".m3u" });
-            picker.SuggestedStartLocation = PickerLocationId.ComputerFolder;
-            var file = await picker.PickSaveFileAsync();
-            using (StreamWriter writer = new StreamWriter(await file.OpenStreamForWriteAsync()))
+            var filters = new Dictionary<string, IList<string>>();
+            filters.Add("PLS Playlist", new List<string>() { ".pls" });
+            using (StreamWriter writer = new StreamWriter(await CrossPlatformHelper.FilePickerHelper.SaveFileAsync(filters)))
             {
                 writer.WriteLine("[playlist]");
                 writer.WriteLine("");
