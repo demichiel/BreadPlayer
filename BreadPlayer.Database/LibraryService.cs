@@ -1,9 +1,6 @@
 ﻿using System.Collections.Generic;
 using BreadPlayer.Models;
 using System.Threading.Tasks;
-using BreadPlayer.Common;
-using DBreeze.Objects;
-using BreadPlayer.Database;
 
 namespace BreadPlayer.Database
 {
