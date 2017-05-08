@@ -15,30 +15,16 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+using BreadPlayer.Database;
+using BreadPlayer.Extensions;
+using BreadPlayer.Helpers;
+using BreadPlayer.Messengers;
+using BreadPlayer.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Windows.Storage;
-using Windows.Storage.Pickers;
-using BreadPlayer.Core;
-using Windows.Storage.AccessCache;
-using BreadPlayer.Models;
-using BreadPlayer.PlaylistBus;
-using BreadPlayer.Extensions;
-using Windows.Storage.Search;
-using BreadPlayer.Messengers;
-using BreadPlayer.Database;
-using BreadPlayer.Common;
-using System.Diagnostics;
-using Windows.UI.Core;
-using BreadPlayer.Dialogs;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Media;
-using Windows.System.Display;
-using BreadPlayer.Helpers;
 
 namespace BreadPlayer.ViewModels
 {
@@ -52,7 +38,7 @@ namespace BreadPlayer.ViewModels
             set
             {
                 Set(ref enableBlur, value);
-                RoamingSettingsHelper.SaveSetting("EnableBlur", value);
+                CrossPlatformHelper.SettingsHelper.SaveSetting("EnableBlur", value);
             }
         }
         bool preventScreenFromLocking;
@@ -75,7 +61,7 @@ namespace BreadPlayer.ViewModels
             set
             {
                 Set(ref replaceLockscreenWithAlbumArt, value);
-                RoamingSettingsHelper.SaveSetting("ReplaceLockscreenWithAlbumArt", value);
+                CrossPlatformHelper.SettingsHelper.SaveSetting("ReplaceLockscreenWithAlbumArt", value);
             }
         }
         string uiTextType;
@@ -85,7 +71,7 @@ namespace BreadPlayer.ViewModels
             set
             {
                 Set(ref uiTextType, value);
-                RoamingSettingsHelper.SaveSetting("UITextType", uiTextType);
+                CrossPlatformHelper.SettingsHelper.SaveSetting("UITextType", uiTextType);
             }
         }
 
@@ -99,7 +85,7 @@ namespace BreadPlayer.ViewModels
             set
             {
                 Set(ref _isThemeDark, value);
-                RoamingSettingsHelper.SaveSetting("SelectedTheme", _isThemeDark == true ? "Light" : "Dark");
+                CrossPlatformHelper.SettingsHelper.SaveSetting("SelectedTheme", _isThemeDark == true ? "Light" : "Dark");
                 // SharedLogic.InitializeTheme();
             }
         }
@@ -149,7 +135,7 @@ namespace BreadPlayer.ViewModels
                     Themes.ThemeManager.SetThemeColor(null);
                 else
                     Themes.ThemeManager.SetThemeColor("default");
-                RoamingSettingsHelper.SaveSetting("ChangeAccentByAlbumArt", changeAccentByAlbumart);
+               CrossPlatformHelper.SettingsHelper.SaveSetting("ChangeAccentByAlbumArt", changeAccentByAlbumart);
             }
         }
 
@@ -179,12 +165,12 @@ namespace BreadPlayer.ViewModels
         {
             LibraryService = new LibraryService(new KeyValueStoreDatabaseService(Init.SharedLogic.DatabasePath, "Tracks", "TracksText"));
             this.PropertyChanged += SettingsViewModel_PropertyChanged;
-            changeAccentByAlbumart = RoamingSettingsHelper.GetSetting<bool>("ChangeAccentByAlbumArt", true);
+            changeAccentByAlbumart = CrossPlatformHelper.SettingsHelper.GetSetting<bool>("ChangeAccentByAlbumArt", true);
             timeOpened = DateTimeOffset.Now.ToString("yyyy-MM-dd HH:mm:ss");
-            uiTextType = RoamingSettingsHelper.GetSetting<string>("UITextType", "Normal");
-            _isThemeDark = RoamingSettingsHelper.GetSetting<string>("SelectedTheme", "Light") == "Light" ? true : false;
-            enableBlur = RoamingSettingsHelper.GetSetting<bool>("EnableBlur", !CrossPlatformHelper.IsMobile);
-            replaceLockscreenWithAlbumArt = RoamingSettingsHelper.GetSetting<bool>("replaceLockscreenWithAlbumArt", false);
+            uiTextType = CrossPlatformHelper.SettingsHelper.GetSetting<string>("UITextType", "Normal");
+            _isThemeDark = CrossPlatformHelper.SettingsHelper.GetSetting<string>("SelectedTheme", "Light") == "Light" ? true : false;
+            enableBlur = CrossPlatformHelper.SettingsHelper.GetSetting<bool>("EnableBlur", !CrossPlatformHelper.IsMobile);
+            replaceLockscreenWithAlbumArt = CrossPlatformHelper.SettingsHelper.GetSetting<bool>("replaceLockscreenWithAlbumArt", false);
             Messengers.Messenger.Instance.Register(Messengers.MessageTypes.MSG_LIBRARY_LOADED, new Action<Message>(HandleLibraryLoadedMessage));
         }
         #endregion
@@ -330,7 +316,7 @@ namespace BreadPlayer.ViewModels
         {
             if (LibraryFoldersCollection.Count <= 0)
             {
-                var folderPaths = RoamingSettingsHelper.GetSetting<string>("folders", null);
+                var folderPaths = CrossPlatformHelper.SettingsHelper.GetSetting<string>("folders", null);
                 if (folderPaths != null)
                 {
                     foreach (var folder in folderPaths.Split('|'))
@@ -352,7 +338,7 @@ namespace BreadPlayer.ViewModels
         /// </summary>
         private async Task AddModifiedFilesAsync()
         {
-            TimeClosed = RoamingSettingsHelper.GetSetting<string>("timeclosed", "0");
+            TimeClosed = CrossPlatformHelper.SettingsHelper.GetSetting<string>("timeclosed", "0");
             ModifiedFiles = await Common.DirectoryWalker.GetModifiedFiles(LibraryFoldersCollection, TimeClosed);
             if (ModifiedFiles.Any())
                 RenameAddOrDeleteFiles(ModifiedFiles);
